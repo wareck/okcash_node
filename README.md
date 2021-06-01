@@ -1,7 +1,7 @@
-![](https://raw.githubusercontent.com/wareck/okcash_node/master/docs/images/logo.png)
+![](https://raw.githubusercontent.com/wareck/okcash_node_raspberry/master/docs/images/logo.png)
 
 ----------
-# [OK] Okcash full autonomous node for Raspberry Pi ##
+# Okcash full autonomous node running on Raspberry Pi ##
 
 
 This script build "Okcash headless daemon node" (okcashd command line only, for best efficiency) .
@@ -20,7 +20,7 @@ This scrypt has been extensively tested and still works on my personal node.
 
 Works on Raspberry OS and Dietpi (32bit)
 
-![](https://raw.githubusercontent.com/wareck/okcash_node/master/docs/images/software.png)
+![](https://raw.githubusercontent.com/wareck/okcash_node_raspberry/master/docs/images/software.png)
 
 
 ----------
@@ -29,24 +29,21 @@ Works on Raspberry OS and Dietpi (32bit)
 
 Quick start :
 
-    git clone https://github.com/wareck/okcash_node.git
+    git clone https://github.com/wareck/okcash_node_raspberry.git
     cd okcash_node
-    ./buidl.sh
+    ./build.sh
     
 
 **Extended documentations links:**
 
- - [lnstall-node](https://github.com/wareck/okcash_node/blob/master/docs/install-node.md)
- - [DietPi-build](https://github.com/wareck/okcash_node/blob/master/docs/dietpi.md)
- - [Fan-control](https://github.com/wareck/okcash_node/blob/master/docs/fan_control.md)
- - [Led-status](https://github.com/wareck/okcash_node/blob/master/docs/led-status.md)
- - [Usb](https://github.com/wareck/okcash_node/blob/master/docs/usb.md)
- - [Oled LCD](https://github.com/wareck/okcash_node/blob/master/docs/oled.md)
+ - [lnstall-node](https://github.com/wareck/okcash_node_raspberry/blob/master/docs/install-node.md)
+ - [DietPi-build](https://github.com/wareck/okcash_node_raspberry/blob/master/docs/dietpi.md)
+ - [Fan-control](https://github.com/wareck/okcash_node_raspberry/blob/master/docs/fan_control.md)
+ - [Led-status](https://github.com/wareck/okcash_node_raspberry/blob/master/docs/led-status.md)
+ - [Usb](https://github.com/wareck/okcash_node_raspberry/blob/master/docs/usb.md)
+ - [Oled LCD](https://github.com/wareck/okcash_node_raspberry/blob/master/docs/oled.md)
 
 **Donate:**
  - Bitcoin: 1Pu12Wimuy6n7csyHkEjZXGXnAQzKBwSBp
  - Okcash: PRcdBWFEKQatAidhK1idFnLnBdvu9mqjM3
  - Litecoin: M84U8YggaJ7T5E3TcqgcoF2BCTaxBMbCvN
-<!--stackedit_data:
-eyJoaXN0b3J5IjpbNzk1NTgwMzQxLDExMzAxMzExNjddfQ==
--->
