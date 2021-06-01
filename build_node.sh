@@ -23,7 +23,7 @@ dudp_port=6970 #default remote port
 ############################
 
 #Bootstrap (speedup first start, but requier 2GB free space on sdcard)
-Bootstrap=NO # YES or NO => download bootstrap.dat (take long time to start, but better)
+Bootstrap=YES # YES or NO => download bootstrap.dat (take long time to start, but better)
 
 #Remove tarball after install
 RemoveTarball=NO # YES or NO => remove source files after install (keep space)
