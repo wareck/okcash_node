@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-Version=4.3
+Version=4.0
 Release=01/Jun/2021
 author=wareck@gmail.com
 
@@ -84,9 +84,10 @@ img_v="Unknown"
 fi
 MyUser=$USER
 MyDir=$PWD
+echo $MyUser>/tmp/node_user
+
 Dw=0 #daemon working flag
 
-echo $MyUser>/tmp/tmp_user
 echo -e "\n\e[93mOkcash Headless Node builder v$Version ($Release)\e[0m"
 echo -e "Author : wareck@gmail.com"
 sleep 2
@@ -192,8 +193,10 @@ then
 echo -e -n "Check MegaDownload        : "
 if ! [ -x "$(command -v megadown)" ]
 then echo -e "[\e[91m NO  \e[0m]"
-curl --silent http://wareck.free.fr/crypto/okcash/megadown.tar.bz2 | tar -xj
+curl -LJO --silent https://github.com/wareck/megadown/releases/download/v1.0/megadown.tar.bz2
+tar xfj megadown.tar.bz2
 sudo mv megadown /usr/local/bin
+rm megadown.tar.bz2
 else
 echo -e "[\e[92m YES \e[0m]";fi
 fi
@@ -303,7 +306,7 @@ cd okcash
 cd src
 if ! [ -f makefile.arm.patch ]
 then
-wget -c http://wareck.free.fr/crypto/okcash/makefile.arm.patch -O makefile.arm.patch #patch for raspebrry build properly
+cp $MyDir/files/makefile.arm.patch .
 echo -e "\e[97mPatching makefile.arm \e[0m"
 patch -p0 <makefile.arm.patch
 fi
@@ -379,7 +382,7 @@ sudo dphys-swapfile swapoff &> /dev/null
 if [ -f /var/swap ];then sudo rm /var/swap;fi
 badsum=0
 
-echo -e "\n\e[95mDownload Bootstrap Files $bt_version :\e[0m"
+echo -e "\n\e[95mDownload Bootstrap Files $bt_version ($bt_parts parts files):\e[0m"
 folder="bootstrap"
 cd /home/$MyUser
 LN=3 #line number
@@ -528,8 +531,8 @@ if  ! grep "curl -Ssk http://127.0.0.1/stats.php" /etc/crontab >/dev/null
 then
 sudo bash -c 'echo "" > /dev/null >>/etc/crontab | sudo -s'
 sudo bash -c 'echo "#Okcash frontend website" > /dev/null >>/etc/crontab | sudo -s'
-sudo bash -c 'form=$(cat "/tmp/tmp_user") && echo "*/5 *  *   *   *  $form curl -Ssk http://127.0.0.1/stats.php > /dev/null" >>/etc/crontab | sudo -s'
-sudo bash -c 'form=$(cat "/tmp/tmp_user") && echo "*/5 *  *   *   *  $form curl -Ssk http://127.0.0.1/peercount.php > /dev/null" >>/etc/crontab | sudo -s'
+sudo bash -c 'form=$(cat "/tmp/node_user") && echo "*/5 *  *   *   *  $form curl -Ssk http://127.0.0.1/stats.php > /dev/null" >>/etc/crontab | sudo -s'
+sudo bash -c 'form=$(cat "/tmp/node_user") && echo "*/5 *  *   *   *  $form curl -Ssk http://127.0.0.1/peercount.php > /dev/null" >>/etc/crontab | sudo -s'
 fi
 sudo /etc/init.d/apache2 restart
 echo -e "Done."
@@ -579,7 +582,7 @@ if  ! grep "watchdog_okcash.sh" /etc/crontab >/dev/null
 then
 sudo bash -c 'echo "" >>/etc/crontab | sudo -s'
 sudo bash -c 'echo "#okcash watchdog" >>/etc/crontab | sudo -s'
-sudo bash -c 'form=$(cat "/tmp/tmp_user") && echo "*/15  * * * * $form /home/$form/scripts/watchdog_okcash.sh" >>/etc/crontab'
+sudo bash -c 'form=$(cat "/tmp/node_user") && echo "*/15  * * * * $form /home/$form/scripts/watchdog_okcash.sh" >>/etc/crontab'
 fi
 echo "Done."
 
@@ -667,7 +670,7 @@ if ! grep "#OKcash Node Start" /etc/rc.local >/dev/null
 	then
 		sudo bash -c 'sed -i -e "s/exit 0//g" /etc/rc.local'
 		sudo bash -c 'echo "#OKcash Node Start" >>/etc/rc.local'
-		sudo bash -c 'form=$(cat "/tmp/tmp_user") && echo -e "su - $form -c \x27okcashd --printtoconsole\x27" >>/etc/rc.local'
+		sudo bash -c 'form=$(cat "/tmp/node_user") && echo -e "su - $form -c \x27okcashd --printtoconsole\x27" >>/etc/rc.local'
 		sudo bash -c 'echo "exit 0" >>/etc/rc.local'
 	fi
 fi
