@@ -671,6 +671,9 @@ if ! grep "#OKcash Node Start" /etc/rc.local >/dev/null
 		sudo bash -c 'sed -i -e "s/exit 0//g" /etc/rc.local'
 		sudo bash -c 'echo "#OKcash Node Start" >>/etc/rc.local'
 		sudo bash -c 'form=$(cat "/tmp/node_user") && echo -e "su - $form -c \x27okcashd --printtoconsole\x27" >>/etc/rc.local'
+		sudo bash -c 'echo "">>/etc/rc.local'
+		sudo bash -c 'echo "#Disable wifi power save" >>/etc/rc.local'
+		sudo basg -c 'echo "/sbin/iwconfig wlan0 power off" >>/etc/rc.local'
 		sudo bash -c 'echo "exit 0" >>/etc/rc.local'
 	fi
 fi
