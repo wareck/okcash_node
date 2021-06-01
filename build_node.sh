@@ -23,7 +23,7 @@ dudp_port=6970 #default remote port
 ############################
 
 #Bootstrap (speedup first start, but requier 2GB free space on sdcard)
-Bootstrap=YES # YES or NO => download bootstrap.dat (take long time to start, but better)
+Bootstrap=NO # YES or NO => download bootstrap.dat (take long time to start, but better)
 
 #Remove tarball after install
 RemoveTarball=NO # YES or NO => remove source files after install (keep space)
@@ -673,7 +673,7 @@ if ! grep "#OKcash Node Start" /etc/rc.local >/dev/null
 		sudo bash -c 'form=$(cat "/tmp/node_user") && echo -e "su - $form -c \x27okcashd --printtoconsole\x27" >>/etc/rc.local'
 		sudo bash -c 'echo "">>/etc/rc.local'
 		sudo bash -c 'echo "#Disable wifi power save" >>/etc/rc.local'
-		sudo basg -c 'echo "/sbin/iwconfig wlan0 power off" >>/etc/rc.local'
+		sudo bash -c 'echo "/sbin/iwconfig wlan0 power off" >>/etc/rc.local'
 		sudo bash -c 'echo "exit 0" >>/etc/rc.local'
 	fi
 fi
