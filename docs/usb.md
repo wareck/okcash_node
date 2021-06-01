@@ -4,7 +4,7 @@
 plug you usb key
 
     dmesg
-![](https://raw.githubusercontent.com/wareck/okcash_node/master/docs/images/usb/1.png)
+![](https://raw.githubusercontent.com/wareck/okcash_node_raspberry/master/docs/images/usb/1.png)
 
 identify your usb key, for me it's sda 
 
@@ -14,7 +14,7 @@ identify your usb key, for me it's sda
 
 ***be carefull, now everything you will do, will erase the usb key !***
 
-![](https://raw.githubusercontent.com/wareck/okcash_node/master/docs/images/usb/2.png)
+![](https://raw.githubusercontent.com/wareck/okcash_node_raspberry/master/docs/images/usb/2.png)
 
 do :
 
@@ -54,9 +54,9 @@ change the line :
 
 like for me :
 
-![](https://raw.githubusercontent.com/wareck/okcash_node/master/docs/images/usb/3.png)
+![](https://raw.githubusercontent.com/wareck/okcash_node_raspberry/master/docs/images/usb/3.png)
 
-![](https://raw.githubusercontent.com/wareck/okcash_node/master/docs/images/usb/4.png)
+![](https://raw.githubusercontent.com/wareck/okcash_node_raspberry/master/docs/images/usb/4.png)
 
 save then :
 

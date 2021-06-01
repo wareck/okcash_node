@@ -8,7 +8,7 @@ Download Balena-etcher : https://www.balena.io/etcher/
 
 Use Balenaetcher to burn image on you sdcard:
 
-![](https://raw.githubusercontent.com/wareck/okcash_node/master/docs/images/dietpi/dietpi_1.png)
+![](https://raw.githubusercontent.com/wareck/okcash_node_raspberry/master/docs/images/dietpi/dietpi_1.png)
 
 Step 2: ***Edit Dietpi.txt***
 open the sdcard  (called "boot")
@@ -47,24 +47,24 @@ For finding raspberry on your network : https://github.com/adafruit/Adafruit-Pi-
 
 Connect to Raspberry : 
 
-![](https://raw.githubusercontent.com/wareck/okcash_node/master/docs/images/dietpi/dietpi_2.png)
+![](https://raw.githubusercontent.com/wareck/okcash_node_raspberry/master/docs/images/dietpi/dietpi_2.png)
 
     Initial user is root
     initial password is dietpi
 
-![](https://raw.githubusercontent.com/wareck/okcash_node/master/docs/images/dietpi/dietpi_3.png)
+![](https://raw.githubusercontent.com/wareck/okcash_node_raspberry/master/docs/images/dietpi/dietpi_3.png)
 
 Accept conditions:
 
-![](https://raw.githubusercontent.com/wareck/okcash_node/master/docs/images/dietpi/dietpi_4.png)
+![](https://raw.githubusercontent.com/wareck/okcash_node_raspberry/master/docs/images/dietpi/dietpi_4.png)
 
 Change passwords (for root user and dietpi user)
 
-![](https://raw.githubusercontent.com/wareck/okcash_node/master/docs/images/dietpi/dietpi_5.png)
+![](https://raw.githubusercontent.com/wareck/okcash_node_raspberry/master/docs/images/dietpi/dietpi_5.png)
 
 Now you will have this menu :
 
-![](https://raw.githubusercontent.com/wareck/okcash_node/master/docs/images/dietpi/dietpi_7.png)
+![](https://raw.githubusercontent.com/wareck/okcash_node_raspberry/master/docs/images/dietpi/dietpi_7.png)
 
 Adjust setup with "dietpi-config" like for me :
 
@@ -77,19 +77,19 @@ Adjust setup with "dietpi-config" like for me :
  - You need to enable "OpenSSH server"
  - Autostart options : Custom
 
-![](https://raw.githubusercontent.com/wareck/okcash_node/master/docs/images/dietpi/dietpi_8.png)
+![](https://raw.githubusercontent.com/wareck/okcash_node_raspberry/master/docs/images/dietpi/dietpi_8.png)
 
-![](https://raw.githubusercontent.com/wareck/okcash_node/master/docs/images/dietpi/dietpi_9.png)
+![](https://raw.githubusercontent.com/wareck/okcash_node_raspberry/master/docs/images/dietpi/dietpi_9.png)
 
 Now validate changes :
 
-![](https://raw.githubusercontent.com/wareck/okcash_node/master/docs/images/dietpi/dietpi_10.png)
+![](https://raw.githubusercontent.com/wareck/okcash_node_rapsberry/master/docs/images/dietpi/dietpi_10.png)
 
-![](https://raw.githubusercontent.com/wareck/okcash_node/master/docs/images/dietpi/dietpi_11.png)
+![](https://raw.githubusercontent.com/wareck/okcash_node_raspberry/master/docs/images/dietpi/dietpi_11.png)
 
 wait install is finished
 
-![](https://raw.githubusercontent.com/wareck/okcash_node/master/docs/images/dietpi/dietpi_12.png)
+![](https://raw.githubusercontent.com/wareck/okcash_node_raspberry/master/docs/images/dietpi/dietpi_12.png)
 
 then reboot raspberry:
 
@@ -110,4 +110,4 @@ Now make a folder for user :
 
 Your raspberry is ready to start install node !
 
-check [install-node.md](https://github.com/wareck/okcash_node/blob/master/docs/install-node.md) doc for the next steps and finalize installation....
+check [install-node.md](https://github.com/wareck/okcash_node_raspberry/blob/master/docs/install-node.md) doc for the next steps and finalize installation....

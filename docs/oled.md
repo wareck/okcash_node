@@ -8,7 +8,7 @@ Works with almost all Oled screen I2C compatible with Adafruit ssd1306
 
 Schematic :
 
-![](https://raw.githubusercontent.com/wareck/okcash_node/master/docs/images/oled.png)
+![](https://raw.githubusercontent.com/wareck/okcash_node_raspberry/master/docs/images/oled.png)
 
 Code :
 

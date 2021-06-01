@@ -4,13 +4,13 @@ This script add a function to an external led.
 Led will be on if your node is connected to network and staking (mining)
 
 #### Shematic :
-![](https://raw.githubusercontent.com/wareck/okcash_node/master/docs/images/led_status.png)
+![](https://raw.githubusercontent.com/wareck/okcash_node_raspberry/master/docs/images/led_status.png)
 
 In this example, my led is connected to GND (pin6) and GPIO17 (pin11)
 
 (you can choose any other GPIO, just don't forget to edit led-status.sh file and change the pin number)
 
-![](https://raw.githubusercontent.com/wareck/okcash_node/master/docs/images/Raspberry-Pi-GPIO-Layout-Model-B-Plus-rotated.png)
+![](https://raw.githubusercontent.com/wareck/okcash_node_raspberry/master/docs/images/Raspberry-Pi-GPIO-Layout-Model-B-Plus-rotated.png)
 
 #### Software :
 If you want to edit options:

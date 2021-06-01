@@ -30,8 +30,8 @@ Step 2 : ***reboot and login again***
 Step 3 : ***clone github folder :***
 
 	cd /home/pi
-	git clone https://github.com/wareck/okcash_build.git 
-	cd /home/pi/okcash_build
+	git clone https://github.com/wareck/okcash_node_raspberry.git 
+	cd /home/pi/okcash_node_raspberry
 
 Step 4 : ***If you wants to use an USB key*** :
 
@@ -62,7 +62,7 @@ Step 5 : ***reboot and login again***
 Launch build scrypt :
 
 	cd /home/pi
-	cd /home/pi/okcash_build
+	cd /home/pi/okcash_node_raspberry
 
 You can edit options :
 
@@ -101,10 +101,10 @@ You can check if everything works fine :
 
 If you can see this king of screen, okcashd is running ...
 
-![](https://raw.githubusercontent.com/wareck/okcash_node/master/docs/images/getinfo.png)
+![](https://raw.githubusercontent.com/wareck/okcash_node_raspberry/master/docs/images/getinfo.png)
 
 ***If you intalled the website frontend :***
 
 open internet browser, use the Raspberry pi network address :
 
-![](https://raw.githubusercontent.com/wareck/okcash_node/master/docs/images/webgui.png)
+![](https://raw.githubusercontent.com/wareck/okcash_node_raspberry/master/docs/images/webgui.png)
