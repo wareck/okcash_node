@@ -3,7 +3,7 @@ Version=`cat ../build_node.sh | grep -Po "(?<=Version=)([0-9]|\.)*(?=\s|$)"`
 echo -e "\e[93mOkcash Headless Node builder $Version USB Tool\e[0m"
 echo -e "Author : wareck@gmail.com"
 
-part_type="f2fs"  #f2fs or ext4
+part_type=""  #f2fs or ext4
 
 sda=""
 sdb=""

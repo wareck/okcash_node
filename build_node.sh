@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-Version=4.0
+Version=4.1
 Release=01/Jun/2021
 author=wareck@gmail.com
 
@@ -8,7 +8,7 @@ author=wareck@gmail.com
 #Best results found was :
 #Boost 1.67 / Openssl 1.0.2u / DB 4.8-30-NC / OkCash git current (v6.9.0.6)
 
-OpenSSL_v=1.0.2u
+OpenSSL_v=1.0.2r
 Boost_v=1_67_0
 DB_v=4.8.30.NC # can be 4.8.30.NC or 4.8.30
 Miniupnpc_v=2.2.2
@@ -613,6 +613,17 @@ if ! grep "consoleblank=0" /boot/cmdline.txt >/dev/null
 	sudo bash -c 'sed -i -e "s/rootwait/rootwait consoleblank=0/g" /boot/cmdline.txt'
 fi
 echo -e "Done."
+
+echo -e "\n\e[95mRaspberry optimisation \e[97mDisable wifi power saving:\e[0m"
+if ! grep "#Disable wifi power saving" /etc/rc.local >/dev/null
+        then
+                sudo bash -c 'sed -i -e "s/exit 0//g" /etc/rc.local'
+                sudo bash -c 'echo "#Disable wifi power saving" >>/etc/rc.local'
+                sudo bash -c 'echo "/sbin/iwconfig wlan0 power off" >>/etc/rc.local'
+                sudo bash -c 'echo "exit 0" >>/etc/rc.local'
+fi
+echo -e "Done."
+
 }
 
 function mkswap {
@@ -671,9 +682,6 @@ if ! grep "#OKcash Node Start" /etc/rc.local >/dev/null
 		sudo bash -c 'sed -i -e "s/exit 0//g" /etc/rc.local'
 		sudo bash -c 'echo "#OKcash Node Start" >>/etc/rc.local'
 		sudo bash -c 'form=$(cat "/tmp/node_user") && echo -e "su - $form -c \x27okcashd --printtoconsole\x27" >>/etc/rc.local'
-		sudo bash -c 'echo "">>/etc/rc.local'
-		sudo bash -c 'echo "#Disable wifi power save" >>/etc/rc.local'
-		sudo bash -c 'echo "/sbin/iwconfig wlan0 power off" >>/etc/rc.local'
 		sudo bash -c 'echo "exit 0" >>/etc/rc.local'
 	fi
 fi
