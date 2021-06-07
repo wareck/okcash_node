@@ -1,13 +1,14 @@
 #!/bin/bash
 set -e
-Version=4.1
-Release=02/Jun/2021
+Version=4.2
+Release=07/Jun/2021
 author=wareck@gmail.com
 
 #Okcash headless 5.0.2.3 RPI Working (sync enable, staking enable)
-#Best results found was :
-#Boost 1.67 / Openssl 1.0.2u / DB 4.8-30-NC / OkCash git current (v6.9.0.6)
+#Best results found and last version use for this script are :
+#Boost 1.67 / Openssl 1.0.2r / DB 4.8-30-NC / OkCash git current release (v6.9.0.5)
 
+Okcash_Release=YES #YES is for the last official release version, NO for last github version
 OpenSSL_v=1.0.2r
 Boost_v=1_67_0
 DB_v=4.8.30.NC # can be 4.8.30.NC or 4.8.30
@@ -107,10 +108,16 @@ echo -e -n "Html port number $Website_port     : \e[38;5;0166mHidden \e[0m"
 fi
 sleep 1
 
-#OKcash_v="`git ls-remote --tags https://github.com/okcashpro/okcash.git | awk '{print $2}' | grep -v '{}' | awk -F"/" '{print $3}' | tail -n 1`"
+if [ $Okcash_Release = "NO" ]
+then
 wget -q -c https://raw.githubusercontent.com/okcashpro/okcash/master/okcash.pro -O /tmp/okcash.pro
 OKcash_v="`cat /tmp/okcash.pro | grep VERSION | awk '{print$3}' | awk '{print $1}' | grep -v '{'`"
 rm /tmp/okcash.pro
+Comment="(Source for last github submission)"
+else
+OKcash_v=6.9.0.5
+Comment="(Release)"
+fi
 
 echo -e "\n\n\e[97mSoftware Release \e[0m"
 echo -e "----------------"
@@ -120,7 +127,8 @@ echo -e "Boost                     : $Boost_v"
 echo -e "OpenSSL                   : $OpenSSL_v"
 echo -e "DB Berkeley               : $DB_v"
 echo -e "Miniupnpc                 : $Miniupnpc_v"
-echo -e "Okcash                    : $OKcash_v"
+echo -e "Okcash                    : $OKcash_v $Comment"
+
 if [ $Bootstrap = "YES" ]
 then
 echo -e "\n\e[97mBootstrap\e[0m"
@@ -205,6 +213,7 @@ if [ $update_me = 1 ]
 then
 echo -e "\n\e[95mRaspberry update:\e[0m"
 sudo apt-get update
+sudo apt-get upgrade -y
 sudo apt-get install aptitude -y
 sudo apt install pv python-dev build-essential $htop_i $ntp_i $pwgen_i $pixz_i $swap_i $xxd_i -y
 sudo sed -i -e "s/# set const/set const/g" /etc/nanorc
@@ -248,7 +257,18 @@ echo -e "Done."
 echo -e "\n\e[95mDownload OkCash $OKcash_v Source Code:\e[0m"
 if ! [ -d $MyDir/okcash ]
 then
+case $Okcash_Release in
+YES)
+	git clone -n https://github.com/okcashpro/okcash.git
+	cd okcash
+	git reset --hard e5e70de031de21ba570e6c83ae8c25dd6ef211a3
+	cd ..
+	;;
+NO)
 	git clone https://github.com/okcashpro/okcash.git
+	;;
+*)	echo "Error";;
+esac
 fi
 echo -e "Done."
 }
