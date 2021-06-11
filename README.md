@@ -16,7 +16,7 @@ You can use Raspbian buster (lite or full, better is to use lite version for eff
 ***Due to the recent database increase, okcash need more power and more memory to works. At the first start, to stakes coin, okcash need enough memory to open database, check blockchain and works on files. Thats why, since april 2020, this node do not work anymore on old Raspberry Pi. I suggest to use a Raspberry Pi3 or higher with a fast sdcard, a SSD drive or a fast USB key. Actually, this software work at home on a raspberry pi4 and a kingston high speed usb key with a 8gb sdcard.***
 
 ----------
-This scrypt has been extensively tested and still works on my personal node.
+This script has been extensively tested and still works on my personal node.
 
 Works on Raspberry OS and Dietpi (32bit)
 
@@ -24,6 +24,16 @@ Works on Raspberry OS and Dietpi (32bit)
 
 
 ----------
+
+**Note:**
+
+Actual setup is:
+Okcash : v6.9.0.5 (Github last official release)
+OpenSSL :v1.0.2r
+LibBoost :v1.67.0
+libDB : v4.8.30.NC
+Miniupnpc : v2.2.2 
+
 
 **Software installation:**
 

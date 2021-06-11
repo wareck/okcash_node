@@ -411,11 +411,13 @@ do
 bootstrap_address=$(curl -s http://wareck.free.fr/crypto/okcash/bootstrap/bootstrap_v.txt | head -$LN | tail -1)
 megadown $bootstrap_address
 LN=$((LN+1))
+echo -e ""
 done
 
 for i in `seq -w 01 $bt_parts`;
 do
 wget -c -q --show-progress http://wareck.free.fr/crypto/okcash/$folder/bootstrap$i.md5
+echo -e ""
 done
 echo -e "Done."
 
