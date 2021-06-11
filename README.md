@@ -28,10 +28,15 @@ Works on Raspberry OS and Dietpi (32bit)
 **Note:**
 
 Actual setup is:
+
 Okcash : v6.9.0.5 (Github last official release)
+
 OpenSSL :v1.0.2r
+
 LibBoost :v1.67.0
+
 libDB : v4.8.30.NC
+
 Miniupnpc : v2.2.2 
 
 
