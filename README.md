@@ -37,12 +37,9 @@ Works on Raspberry OS and Dietpi (32bit)
 
 **Miniupnpc** : v2.2.2 
 
-
-
+----------
 
 **Software installation:**
-
-Quick start :
 
     git clone https://github.com/wareck/okcash_node_raspberry.git
     cd okcash_node
