@@ -38,6 +38,8 @@ Works on Raspberry OS and Dietpi (32bit)
 **Miniupnpc** : v2.2.2 
 
 
+
+
 **Software installation:**
 
 Quick start :
@@ -57,6 +59,6 @@ Quick start :
  - [Oled LCD](https://github.com/wareck/okcash_node_raspberry/blob/master/docs/oled.md)
 
 **Donate:**
- - Bitcoin: 1Pu12Wimuy6n7csyHkEjZXGXnAQzKBwSBp
- - Okcash: PRcdBWFEKQatAidhK1idFnLnBdvu9mqjM3
+ - Bitcoin : 1Pu12Wimuy6n7csyHkEjZXGXnAQzKBwSBp
+ - Okcash  : PRcdBWFEKQatAidhK1idFnLnBdvu9mqjM3
  - Litecoin: M84U8YggaJ7T5E3TcqgcoF2BCTaxBMbCvN
