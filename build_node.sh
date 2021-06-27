@@ -41,6 +41,9 @@ Website_port=80
 #Enable firewall
 Firewall=YES
 
+#Disable Ipv6
+Ipv6=NO
+
 #Enable autostart
 AutoStart=YES
 
@@ -179,7 +182,6 @@ gcc_i=""
 xz_i=""
 pixz_i=""
 pwgen_i=""
-#xz_i=""
 swap_i=""
 xxd=""
 echo -e -n "Check PV                  : "
@@ -646,6 +648,24 @@ if ! grep "#Disable wifi power saving" /etc/rc.local >/dev/null
 fi
 echo -e "Done."
 
+if [ $Ipv6 = "NO" ]
+then
+echo -e "\n\e[95mRaspberry optimisation \e[97mDisable ipv6:\e[0m"
+if ! grep "#Disable ipv6" /etc/sysctl.conf  >/dev/null
+then
+cp /etc/sysctl.conf /tmp
+cat <<'EOF'>>  /tmp/sysctl.conf
+
+#Disable ipv6
+net.ipv6.conf.all.disable_ipv6=1
+net.ipv6.conf.default.disable_ipv6=1
+net.ipv6.conf.lo.disable_ipv6=1
+net.ipv6.conf.eth0.disable_ipv6 = 1
+EOF
+sudo cp /tmp/sysctl.conf /etc/sysctl.conf
+fi
+echo -e "Done."
+fi
 }
 
 function mkswap {
@@ -753,8 +773,11 @@ fi
 if [ -f /tmp/ufw ]; then sudo rm /tmp/ufw ;fi
 sudo cp /etc/default/ufw /tmp/ufw
 sudo chown $USER /tmp/ufw
-#sudo sed -i '/IPV6=/d' /tmp/ufw
-#sudo echo "IPV6=no" >> /tmp/ufw
+if [ $Ipv6 = "NO" ]
+then
+sudo sed -i '/IPV6=/d' /tmp/ufw
+sudo echo "IPV6=no" >> /tmp/ufw
+fi
 sudo chmod 644 /tmp/ufw
 sudo chown root:root /tmp/ufw
 sudo cp /tmp/ufw /etc/default/ufw
