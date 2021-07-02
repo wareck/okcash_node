@@ -57,5 +57,5 @@ Works on Raspberry OS and Dietpi (32bit)
 
 **Donate:**
  - Bitcoin : 1Pu12Wimuy6n7csyHkEjZXGXnAQzKBwSBp
- - Okcash  : PRcdBWFEKQatAidhK1idFnLnBdvu9mqjM3
+ - Okcash  : PH3JcR9inEeNZD6gNoLDYwaPAFpgjmrbue
  - Litecoin: M84U8YggaJ7T5E3TcqgcoF2BCTaxBMbCvN

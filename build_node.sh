@@ -847,7 +847,7 @@ fi
 echo -e "\nwareck@gmail.com\n"
 echo -e "Donate:"
 
-echo -e "OKcash:  PRcdBWFEKQatAidhK1idFnLnBdvu9mqjM3"
+echo -e "OKcash:  PH3JcR9inEeNZD6gNoLDYwaPAFpgjmrbue"
 echo -e "Bitcoin: 1Pu12Wimuy6n7csyHkEjZXGXnAQzKBwSBp"
 echo -e "Litecoin: M84U8YggaJ7T5E3TcqgcoF2BCTaxBMbCvN"
 echo -e ""
