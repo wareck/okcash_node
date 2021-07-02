@@ -8,7 +8,7 @@ author=wareck@gmail.com
 #Best results found and last version use for this script are :
 #Boost 1.67 / Openssl 1.0.2r / DB 4.8-30-NC / OkCash git current release (v6.9.0.5)
 
-Okcash_Release=YES #YES is for the last official release version, NO for last github version
+Okcash_Release=NO #YES is for the last official release version, NO for last github version
 OpenSSL_v=1.0.2r
 Boost_v=1_67_0
 DB_v=4.8.30.NC # can be 4.8.30.NC or 4.8.30
@@ -116,7 +116,7 @@ then
 wget -q -c https://raw.githubusercontent.com/okcashpro/okcash/master/okcash.pro -O /tmp/okcash.pro
 OKcash_v="`cat /tmp/okcash.pro | grep VERSION | awk '{print$3}' | awk '{print $1}' | grep -v '{'`"
 rm /tmp/okcash.pro
-Comment="(Source for last github submission)"
+Comment="(Source from github dev)"
 else
 OKcash_v=6.9.0.5
 Comment="(Release)"
@@ -362,6 +362,7 @@ cat <<'EOF'>> /home/$MyUser/.okcash/okcash.conf
 daemon=1
 listen=1
 staking=1
+enableaccounts=1
 maxconnections=15
 
 #Connection User and Password
@@ -419,7 +420,6 @@ done
 for i in `seq -w 01 $bt_parts`;
 do
 wget -c -q --show-progress http://wareck.free.fr/crypto/okcash/$folder/bootstrap$i.md5
-echo -e ""
 done
 echo -e "Done."
 
