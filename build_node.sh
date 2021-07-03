@@ -1,14 +1,15 @@
 #!/bin/bash
 set -e
-Version=4.2
-Release=07/Jun/2021
+Version=4.3
+Release=03/Jul/2021
 author=wareck@gmail.com
 
 #Okcash headless 5.0.2.3 RPI Working (sync enable, staking enable)
 #Best results found and last version use for this script are :
 #Boost 1.67 / Openssl 1.0.2r / DB 4.8-30-NC / OkCash git current release (v6.9.0.5)
 
-Okcash_Release=NO #YES is for the last official release version, NO for last github version
+Okcash_Release=YES #YES is for the last official release version, NO for last github version
+
 OpenSSL_v=1.0.2r
 Boost_v=1_67_0
 DB_v=4.8.30.NC # can be 4.8.30.NC or 4.8.30
