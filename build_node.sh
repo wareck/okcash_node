@@ -1,14 +1,14 @@
 #!/bin/bash
 set -e
-Version=4.3
-Release=03/Jul/2021
+Version=4.6
+Release=03/Aug/2021
 author=wareck@gmail.com
 
 #Okcash headless 5.0.2.3 RPI Working (sync enable, staking enable)
 #Best results found and last version use for this script are :
 #Boost 1.67 / Openssl 1.0.2r / DB 4.8-30-NC / OkCash git current release (v6.9.0.5)
 
-Okcash_Release=YES #YES is for the last official release version, NO for last github version
+Okcash_Release=YES #YES is for the last official release version(v6.9.0.5) , NO for last github version
 
 OpenSSL_v=1.0.2r
 Boost_v=1_67_0
@@ -137,8 +137,8 @@ if [ $Bootstrap = "YES" ]
 then
 echo -e "\n\e[97mBootstrap\e[0m"
 echo -e "---------"
-bt_version="`curl -s http://wareck.free.fr/crypto/okcash/bootstrap/bootstrap_v.txt | awk 'NR==1 {print$3;exit}'`"
-bt_parts="`curl -s http://wareck.free.fr/crypto/okcash/bootstrap/bootstrap_v.txt | awk 'NR==2 {print$2; exit}'`"
+bt_version="`curl -s https://raw.githubusercontent.com/wareck/bootstrap_okcash/main/bootstrap_v.txt | awk 'NR==1 {print$3;exit}'`"
+bt_parts="`curl -s https://raw.githubusercontent.com/wareck/bootstrap_okcash/main/bootstrap_v.txt | awk 'NR==2 {print$2; exit}'`"
 echo -e "Boostrap.dat              : $bt_version => $bt_parts parts"
 fi
 if [ $Bootstrap = "YES" ] && ! [ -f .pass ]
@@ -181,7 +181,7 @@ ntp_i=""
 pv_i=""
 gcc_i=""
 xz_i=""
-pixz_i=""
+p7zip_i=""
 pwgen_i=""
 swap_i=""
 xxd=""
@@ -192,8 +192,8 @@ then
 echo -e -n "Check NTPD                : "
 if ! [ -x "$(command -v ntpd)" ];then echo -e "[\e[91m NO  \e[0m]" && ntp_i="ntp" && update_me=1;else echo -e "[\e[92m YES \e[0m]";fi
 fi
-echo -e -n "Check PIXZ                : "
-if ! [ -x "$(command -v pixz)" ];then echo -e "[\e[91m NO  \e[0m]" && pixz_i="pixz libbz2-dev liblzma-dev libzip-dev zlib1g-dev" && update_me=1;else echo -e "[\e[92m YES \e[0m]";fi
+echo -e -n "Check P7ZIP               : "
+if ! [ -x "$(command -v 7z)" ];then echo -e "[\e[91m NO  \e[0m]" && p7zip_i="p7zip-full libbz2-dev liblzma-dev libzip-dev zlib1g-dev" && update_me=1;else echo -e "[\e[92m YES \e[0m]";fi
 echo -e -n "Check PWGEN               : "
 if ! [ -x "$(command -v pwgen)" ];then echo -e "[\e[91m NO  \e[0m]" && pwgen_i="pwgen" && update_me=1;else echo -e "[\e[92m YES \e[0m]";fi
 if ! [ -x "$(command -v xxd)" ]; then xxd_i="xxd" && update_me=1;fi
@@ -218,7 +218,7 @@ echo -e "\n\e[95mRaspberry update:\e[0m"
 sudo apt-get update
 sudo apt-get upgrade -y
 sudo apt-get install aptitude -y
-sudo apt install pv python-dev build-essential $htop_i $ntp_i $pwgen_i $pixz_i $swap_i $xxd_i -y
+sudo apt install pv python-dev build-essential $htop_i $ntp_i $pwgen_i $p7zip_i $swap_i $xxd_i -y
 sudo sed -i -e "s/# set const/set const/g" /etc/nanorc
 fi
 sleep 5
@@ -412,43 +412,43 @@ cd /home/$MyUser
 LN=3 #line number
 for i in `seq 1 $bt_parts`;
 do
-bootstrap_address=$(curl -s http://wareck.free.fr/crypto/okcash/bootstrap/bootstrap_v.txt | head -$LN | tail -1)
+bootstrap_address=$(curl -s https://raw.githubusercontent.com/wareck/bootstrap_okcash/main/bootstrap_v.txt | head -$LN | tail -1)
 megadown $bootstrap_address
 LN=$((LN+1))
 echo -e ""
 done
 
-for i in `seq -w 01 $bt_parts`;
+for i in `seq -w 001 $bt_parts`;
 do
-wget -c -q --show-progress http://wareck.free.fr/crypto/okcash/$folder/bootstrap$i.md5
+wget -c -q --show-progress https://raw.githubusercontent.com/wareck/bootstrap_okcash/main/bootstrap.$i.md5
 done
 echo -e "Done."
 
 echo -e "\n\e[95mBootstrap checksum test:\e[0m"
-for i in `seq -w 01 $bt_parts`;
+for i in `seq -w 001 $bt_parts`;
 do
-echo -e -n "Bootstrap.part$i md5sum Test: " && if md5sum --status -c bootstrap$i.md5; then echo -e "[\e[92m OK \e[0m]"; else echo -e "[\e[91m NO \e[0m]" && badsum=1 ;fi
+echo -e -n "Bootstrap.$i.md5 md5sum Test: " && if md5sum --status -c bootstrap.$i.md5; then echo -e "[\e[92m OK \e[0m]"; else echo -e "[\e[91m NO \e[0m]" && badsum=1 ;fi
 if [ $badsum = "1" ]
 then
-echo -e "\e[38;5;166mBootstrap.tar.xz error !\e[0m"
+echo -e "\e[38;5;166mBootstrap.7z error !\e[0m"
 echo -e "\e[38;5;166mMaybe file damaged or not fully download\e[0m"
 echo -e "\e[38;5;166mRestart build_node to try again !\e[0m"
 exit
 fi
 done
 
-echo -e "\n\e[95mJoin bootstrap.tar.xz:\e[0m"
-mv bootstrap.part01 bootstrap.tar.xz
-echo bootstrap.part01
-list=$(ls bootstrap.part*)
-for i in ${list[@]}
-do
-cat "$i" >> bootstrap.tar.xz
-echo "$i"
-rm "$i"
-done
-rm bootstrap*.md5
-echo -e "Done."
+#echo -e "\n\e[95mJoin bootstrap.tar.xz:\e[0m"
+#mv bootstrap.part01 bootstrap.tar.xz
+#echo bootstrap.part01
+#list=$(ls bootstrap.part*)
+#for i in ${list[@]}
+#do
+#cat "$i" >> bootstrap.tar.xz
+#echo "$i"
+#rm "$i"
+#done
+rm bootstrap.*.md5
+#echo -e "Done."
 
 if [ -f ~/.okcash/blk0001.dat ]
 then
@@ -463,8 +463,10 @@ echo "Done."
 fi
 
 echo -e "\n\e[95mExtract bootstrap.tar.xz:\e[0m"
-pixz -d < bootstrap.tar.xz | tar xvf -
-rm bootstrap.tar.xz
+#pixz -d < bootstrap.tar.xz | tar xvf -
+7za x bootstrap.7z.001
+sleep 3
+rm bootstrap.7z.*
 echo -e "Done."
 sudo dphys-swapfile setup &> /dev/null
 sudo dphys-swapfile swapon &> /dev/null
