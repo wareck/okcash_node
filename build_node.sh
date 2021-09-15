@@ -785,17 +785,17 @@ sudo chmod 644 /tmp/ufw
 sudo chown root:root /tmp/ufw
 sudo cp /tmp/ufw /etc/default/ufw
 echo -e "\e[33mOpening up Port 22 TCP for SSH:\e[0m"
-sudo ufw allow 22/tcp
+sudo ufw allow 22/tcp || true
 echo -e "\e[33mOpening up Port $drpc_port/$dudp_port for Okcash daemon:\e[0m"
-sudo ufw allow $drpc_port,$dudp_port/tcp
+sudo ufw allow $drpc_port,$dudp_port/tcp || true
 if [ $Website = "YES" ]
 then
 echo -e "\e[33mOpening up Port $Website_port for website frontpage:\e[0m"
-sudo ufw allow $Website_port/tcp
+sudo ufw allow $Website_port/tcp || true
 fi
 echo -e ""
-sudo ufw status verbose
-sudo ufw --force enable
+sudo ufw status verbose || true
+sudo ufw --force enable || true
 echo -e "Done."
 }
 
