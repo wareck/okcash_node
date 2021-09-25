@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
-Version=4.7
-Release=25/sept/2021
+Version=4.8
+Release=25/sep/2021
 author=wareck@gmail.com
 
 #Okcash headless 5.0.2.3 RPI Working (sync enable, staking enable)
@@ -140,7 +140,7 @@ echo -e "---------"
 bt_version="`curl -s https://raw.githubusercontent.com/wareck/bootstrap_okcash/main/bootstrap_v.txt | awk 'NR==1 {print$3;exit}'`"
 bt_parts="`curl -s https://raw.githubusercontent.com/wareck/bootstrap_okcash/main/bootstrap_v.txt | awk 'NR==2 {print$2; exit}'`"
 bt_size="`curl -s https://raw.githubusercontent.com/wareck/bootstrap_okcash/main/bootstrap_v.txt | awk 'NR==3 {print$2; exit}'`"
-echo -e "Boostrap.dat              : $bt_version => $bt_parts parts"
+echo -e "Boostrap.dat              : $bt_version ($bt_parts files)"
 fi
 if [ $Bootstrap = "YES" ] && ! [ -f .pass ]
 then
@@ -407,7 +407,7 @@ sudo dphys-swapfile swapoff &> /dev/null
 if [ -f /var/swap ];then sudo rm /var/swap;fi
 badsum=0
 
-echo -e "\n\e[95mDownload Bootstrap $bt_version ($bt_partsx$btsize Mo ):\e[0m"
+echo -e "\n\e[95mDownload Bootstrap $bt_version ( $bt_parts x $bt_size Mo ):\e[0m"
 folder="bootstrap"
 cd /home/$MyUser
 LN=4 #Start line number
