@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
-Version=4.6
-Release=03/Aug/2021
+Version=4.7
+Release=25/sept/2021
 author=wareck@gmail.com
 
 #Okcash headless 5.0.2.3 RPI Working (sync enable, staking enable)
@@ -10,7 +10,7 @@ author=wareck@gmail.com
 
 Okcash_Release=YES #YES is for the last official release version(v6.9.0.5) , NO for last github version
 
-OpenSSL_v=1.0.2r
+OpenSSL_v=1.0.2u
 Boost_v=1_67_0
 DB_v=4.8.30.NC # can be 4.8.30.NC or 4.8.30
 Miniupnpc_v=2.2.2
@@ -139,6 +139,7 @@ echo -e "\n\e[97mBootstrap\e[0m"
 echo -e "---------"
 bt_version="`curl -s https://raw.githubusercontent.com/wareck/bootstrap_okcash/main/bootstrap_v.txt | awk 'NR==1 {print$3;exit}'`"
 bt_parts="`curl -s https://raw.githubusercontent.com/wareck/bootstrap_okcash/main/bootstrap_v.txt | awk 'NR==2 {print$2; exit}'`"
+bt_size="`curl -s https://raw.githubusercontent.com/wareck/bootstrap_okcash/main/bootstrap_v.txt | awk 'NR==3 {print$2; exit}'`"
 echo -e "Boostrap.dat              : $bt_version => $bt_parts parts"
 fi
 if [ $Bootstrap = "YES" ] && ! [ -f .pass ]
@@ -406,10 +407,10 @@ sudo dphys-swapfile swapoff &> /dev/null
 if [ -f /var/swap ];then sudo rm /var/swap;fi
 badsum=0
 
-echo -e "\n\e[95mDownload Bootstrap Files $bt_version ($bt_parts parts files):\e[0m"
+echo -e "\n\e[95mDownload Bootstrap $bt_version ($bt_partsx$btsize Mo ):\e[0m"
 folder="bootstrap"
 cd /home/$MyUser
-LN=3 #line number
+LN=4 #Start line number
 for i in `seq 1 $bt_parts`;
 do
 bootstrap_address=$(curl -s https://raw.githubusercontent.com/wareck/bootstrap_okcash/main/bootstrap_v.txt | head -$LN | tail -1)
