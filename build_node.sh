@@ -137,9 +137,9 @@ if [ $Bootstrap = "YES" ]
 then
 echo -e "\n\e[97mBootstrap\e[0m"
 echo -e "---------"
-bt_version="`curl -s https://bitbucket.org/wareck/bootstrap_okcash/raw/28a2c2bd794b2fd839e2706e3bafc80d2b801daa/bootstrap_v.txt | awk 'NR==1 {print$3;exit}'`"
-bt_parts="`curl -s https://bitbucket.org/wareck/bootstrap_okcash/raw/28a2c2bd794b2fd839e2706e3bafc80d2b801daa/bootstrap_v.txt | awk 'NR==2 {print$2; exit}'`"
-bt_size="`curl -s https://bitbucket.org/wareck/bootstrap_okcash/raw/28a2c2bd794b2fd839e2706e3bafc80d2b801daa/bootstrap_v.txt | awk 'NR==3 {print$2; exit}'`"
+bt_version="`curl -s https://bitbucket.org/wareck/bootstrap_okcash/raw/master/bootstrap_v.txt | awk 'NR==1 {print$3;exit}'`"
+bt_parts="`curl -s https://bitbucket.org/wareck/bootstrap_okcash/raw/master/bootstrap_v.txt | awk 'NR==2 {print$2; exit}'`"
+bt_size="`curl -s https://bitbucket.org/wareck/bootstrap_okcash/raw/master/bootstrap_v.txt | awk 'NR==3 {print$2; exit}'`"
 echo -e "Boostrap.dat              : $bt_version ($bt_parts files)"
 fi
 if [ $Bootstrap = "YES" ] && ! [ -f .pass ]
@@ -413,7 +413,7 @@ cd /home/$MyUser
 LN=4 #Start line number
 for i in `seq 1 $bt_parts`;
 do
-bootstrap_address=$(curl -s https://bitbucket.org/wareck/bootstrap_okcash/raw/28a2c2bd794b2fd839e2706e3bafc80d2b801daa/bootstrap_v.txt | head -$LN | tail -1)
+bootstrap_address=$(curl -s https://bitbucket.org/wareck/bootstrap_okcash/raw/master/bootstrap_v.txt | head -$LN | tail -1)
 megadown $bootstrap_address
 LN=$((LN+1))
 echo -e ""
@@ -421,7 +421,7 @@ done
 
 for i in `seq -w 001 $bt_parts`;
 do
-wget -c -q --show-progress https://bitbucket.org/wareck/bootstrap_okcash/raw/28a2c2bd794b2fd839e2706e3bafc80d2b801daa/bootstrap.$i.md5
+wget -c -q --show-progress https://bitbucket.org/wareck/bootstrap_okcash/raw/master/bootstrap.$i.md5
 done
 echo -e "Done."
 
