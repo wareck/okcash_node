@@ -54,6 +54,7 @@ Works on Raspberry OS and Dietpi (32bit)
  - [Led-status](https://github.com/wareck/okcash_node_raspberry/blob/master/docs/led-status.md)
  - [Usb](https://github.com/wareck/okcash_node_raspberry/blob/master/docs/usb.md)
  - [Oled LCD](https://github.com/wareck/okcash_node_raspberry/blob/master/docs/oled.md)
+ - [RTC-addon](https://github.com/wareck/okcash_node_raspberry/blob/master/docs/rtc.md)
 
 **Donate:**
  - Bitcoin : 1Pu12Wimuy6n7csyHkEjZXGXnAQzKBwSBp
