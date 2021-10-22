@@ -139,7 +139,7 @@ echo -e "\n\e[97mBootstrap\e[0m"
 echo -e "---------"
 bt_version="`curl -s http://wareck.free.fr/crypto/okcash/bootstrap/bootstrap_v.txt | awk 'NR==1 {print$3;exit}'`"
 bt_parts="`curl -s http://wareck.free.fr/crypto/okcash/bootstrap/bootstrap_v.txt | awk 'NR==2 {print$2; exit}'`"
-bt_size="`curl -s http://wareck.free.fr/crypto/okcash/bootstrap/bootstrap_v.txt | awk 'NR==3 {print$2; exit}'`"
+bt_size="`curl -s http://wareck.free.fr/crypto/okcash/bootstrap/bootstrap_v.txt | awk 'NR==3 {print$2; exit}' | sed 's/.$//'`"
 echo -e "Boostrap.dat              : $bt_version ($bt_parts files)"
 fi
 if [ $Bootstrap = "YES" ] && ! [ -f .pass ]
