@@ -416,8 +416,9 @@ do
 bootstrap_address=$(curl -s http://wareck.free.fr/crypto/okcash/bootstrap/bootstrap_v.txt | head -$LN | tail -1)
 megadown $bootstrap_address
 LN=$((LN+1))
-echo -e ""
 done
+
+echo ""
 
 for i in `seq -w 001 $bt_parts`;
 do
