@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
-Version=4.9
-Release=18/oct/2021
+Version=5.0
+Release=31/oct/2021
 author=wareck@gmail.com
 
 #Okcash headless 5.0.2.3 RPI Working (sync enable, staking enable)
@@ -13,7 +13,7 @@ Okcash_Release=YES #YES is for the last official release version(v6.9.0.5) , NO 
 OpenSSL_v=1.0.2u
 Boost_v=1_67_0
 DB_v=4.8.30.NC # can be 4.8.30.NC or 4.8.30
-Miniupnpc_v=2.2.2
+Miniupnpc_v=2.2.3
 
 Dw=0 # Daemon working static
 drpc_port=6969 #default rpc port
