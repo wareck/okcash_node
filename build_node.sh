@@ -73,6 +73,7 @@ DietPi_="NO"
 if [ $OSV = 8 ];then img_v="Jessie";fi
 if [ $OSV = 9 ];then img_v="Strecth"; fi
 if [ $OSV = 10 ];then img_v="Buster"; fi
+if [ $OSV = 11 ];then img_v="Bullseye"; fi
 fi
 if [ -f /proc/device-tree/model ]
 then
