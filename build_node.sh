@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
-Version=5.0
-Release=31/oct/2021
+Version=5.1
+Release=13/nov/2021
 author=wareck@gmail.com
 
 #Okcash headless RPI Working (sync enable, staking enable)
