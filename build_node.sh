@@ -4,18 +4,18 @@ Version=5.0
 Release=31/oct/2021
 author=wareck@gmail.com
 
-#Okcash headless 5.0.2.3 RPI Working (sync enable, staking enable)
+#Okcash headless RPI Working (sync enable, staking enable)
 #Best results found and last version use for this script are :
 #Boost 1.67 / Openssl 1.0.2r / DB 4.8-30-NC / OkCash git current release (v6.9.0.5)
 
-Okcash_Release=YES #YES is for the last official release version(v6.9.0.5) , NO for last github version
+Okcash_Release=YES #YES is for the last official release version(v6.9.0.5) , NO for last github version (6.9.0.6)
 
 OpenSSL_v=1.0.2u
 Boost_v=1_67_0
-DB_v=4.8.30.NC # can be 4.8.30.NC or 4.8.30
+DB_v=4.8.30.NC
 Miniupnpc_v=2.2.3
 
-Dw=0 # Daemon working static
+Dw=0
 drpc_port=6969 #default rpc port
 dudp_port=6970 #default remote port
 
@@ -139,7 +139,7 @@ echo -e "\n\e[97mBootstrap\e[0m"
 echo -e "---------"
 bt_version="`curl -s http://wareck.free.fr/crypto/okcash/bootstrap/bootstrap_v.txt | awk 'NR==1 {print$3;exit}'`"
 bt_parts="`curl -s http://wareck.free.fr/crypto/okcash/bootstrap/bootstrap_v.txt | awk 'NR==2 {print$2; exit}'`"
-bt_size="`curl -s http://wareck.free.fr/crypto/okcash/bootstrap/bootstrap_v.txt | awk 'NR==3 {print$2; exit}' | sed 's/.$//'`"
+bt_size="`curl -s http://wareck.free.fr/crypto/okcash/bootstrap/bootstrap_v.txt | awk 'NR==3 {print$3; exit}'`"
 echo -e "Boostrap.dat              : $bt_version ($bt_parts files)"
 fi
 if [ $Bootstrap = "YES" ] && ! [ -f .pass ]
@@ -439,18 +439,7 @@ exit
 fi
 done
 
-#echo -e "\n\e[95mJoin bootstrap.tar.xz:\e[0m"
-#mv bootstrap.part01 bootstrap.tar.xz
-#echo bootstrap.part01
-#list=$(ls bootstrap.part*)
-#for i in ${list[@]}
-#do
-#cat "$i" >> bootstrap.tar.xz
-#echo "$i"
-#rm "$i"
-#done
 rm bootstrap.*.md5
-#echo -e "Done."
 
 if [ -f ~/.okcash/blk0001.dat ]
 then
@@ -465,7 +454,6 @@ echo "Done."
 fi
 
 echo -e "\n\e[95mExtract bootstrap.tar.xz:\e[0m"
-#pixz -d < bootstrap.tar.xz | tar xvf -
 7za x bootstrap.7z.001
 sleep 3
 rm bootstrap.7z.*
@@ -786,6 +774,8 @@ fi
 sudo chmod 644 /tmp/ufw
 sudo chown root:root /tmp/ufw
 sudo cp /tmp/ufw /etc/default/ufw
+sudo /etc/init.d/ufw restart
+sleep 1
 echo -e "\e[33mOpening up Port 22 TCP for SSH:\e[0m"
 sudo ufw allow 22/tcp || true
 echo -e "\e[33mOpening up Port $drpc_port/$dudp_port for Okcash daemon:\e[0m"
@@ -873,7 +863,7 @@ then
 	echo -e -n "$i "
 	sleep 1
 	done
-	echo ""
+	echo -e "\n\n"
 	sudo reboot
 fi
 else
