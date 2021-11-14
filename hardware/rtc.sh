@@ -29,7 +29,7 @@ read -n 1 -r -s -p "Press any key to continue..."
 echo -e "\n\n\e[95mRaspberry update :\e[0m"
 sudo apt-get update
 echo -e "\n\e[95mInstalling libraries :\e[0m"
-sudo apt install python-smbus python3-smbus python-dev python3-dev i2c-tools rpi.gpio -y
+sudo apt install python3-smbus python3-dev i2c-tools rpi.gpio-common -y
 if ! grep "dtparam=i2c1=on" /boot/config.txt
 then
 sudo bash -c 'echo "" >>/boot/config.txt'

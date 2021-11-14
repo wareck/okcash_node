@@ -77,13 +77,7 @@ if [ $OSV = 11 ];then img_v="Bullseye"; fi
 fi
 if [ -f /proc/device-tree/model ]
 then
-ident=`cat /proc/device-tree/model | awk '{print $6}'`
-if [ $ident = "Plus" ]
-then
-ident=`cat /proc/device-tree/model | awk '{print $1" "$2" "$3""$5" "$6" "$7" v"$8}'`
-else
-ident=`cat /proc/device-tree/model | awk '{print $1" "$2" "$3""$5" v"$7}'`
-fi
+ident=$(tr -d '\0' < /proc/device-tree/model)
 else
 ident=""
 img_v="Unknown"
@@ -500,8 +494,10 @@ sudo apt-get install apache2 php5 php5-xmlrpc curl php5-curl -y;;
 sudo apt-get install apache2 php7.0 php7.0-xmlrpc curl php7.0-curl -y ;;
 10)
 sudo apt-get install apache2 php7.3 php7.3-xmlrpc curl php7.3-curl -y ;;
+11)
+sudo apt-get install apache2 php7.4 php7.4-xmlrpc php7.4-curl -y ;;
 *)
-echo -e "\e[38;5;166mUnknown system, please use Raspberry Stretch , Jessie or Buster image...\e[0m"
+echo -e "\e[38;5;166mUnknown system, please use Raspberry Stretch , Jessie, Buster or Bullseye image...\e[0m"
 exit 0
 ;;
 esac
@@ -830,15 +826,12 @@ if [ $Banner = "YES" ] ; then banner_ ;fi
 echo -e "\n\e[97mBuild is finished !!!\e[0m"
 
 if [ $Raspi_optimize = "YES" ];then echo -e "\e[92mRaspberry was optimized : need to reboot ...\e[0m";fi
-if [ $Website = "YES" ]
-then
-echo -e "\e[92mDon't forget to edit your /var/www/node_status/php/config.php file ...\e[0m"
 if [ ! $Website_port = "80" ]
 then
 _IP=$(hostname -I) || true
 echo -e "\e[92mHtml frontend hidden use http://${_IP::-1}:$Website_port to check the webpage \e[0m"
 fi
-fi
+
 
 echo -e "\nwareck@gmail.com\n"
 echo -e "Donate:"
