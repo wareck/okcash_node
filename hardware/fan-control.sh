@@ -65,7 +65,7 @@ import datetime
 #########################
 sleepTime = 30	# Time to sleep between checking the temperature
                 # want to write unbuffered to file
-fileLog = open('/tmp/run-fan.log', 'w+', 0)
+fileLog = open('/tmp/run-fan.log', 'w+', buffering=1)
 
 #########################
 # Log messages should be time stamped
@@ -281,9 +281,13 @@ After=meadiacenter.service
    WantedBy=multi-user.target
 EOF
 sed -i -e "s/XXX/$MyUser/g" /tmp/run-fan.service
-#if [ $DietPi_ = "YES" ]
-#then sed -i -e "s/python3/python/g" /tmp/run-fan.service
-#fi
+if [ $DietPi_ = "NO" ]
+then
+OSV=$(sed 's/\..*//' /etc/debian_version)
+if [ $OSV = 11 ]
+then sed -i -e "s/python/python3/g" /tmp/run-fan.service
+fi
+fi
 sudo bash -c 'cp /tmp/run-fan.service /lib/systemd/system/ | sudo -s'
 echo -e "Done"
 sleep 1
@@ -306,6 +310,7 @@ fi
 MyUser=$USER
 if ! [ -x "$(command -v pip3)" ];then sudo apt-get install python3-pip i2c-tools -y;fi
 sudo pip3 install smbus
+sudo pip3 install --upgrade RPi.GPIO
 if [ ! -d /home/$USER/scripts ];then mkdir /home/$USER/scripts ; fi
 if [ -f /home/$USER/scripts/run-fan.py ];then rm /home/$USER/scripts/run-fan.py ; fi
 cat <<'EOF'>> /home/$USER/scripts/run-fan.py

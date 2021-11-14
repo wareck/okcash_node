@@ -88,6 +88,14 @@ sudo bash -c "sed -i -e 's/XXX/$XXX/g' /home/$USER/scripts/ledstatus/ledstatus.s
 sudo bash -c "sed -i -e 's/YYY/$YYY/g' /home/$USER/scripts/ledstatus/ledstatus.sh"
 sudo bash -c "sed -i -e 's/PPP/$GPIO_PIN/g' /home/$USER/scripts/ledstatus/ledstatus.sh"
 sudo bash -c "sed -i -e 's/III/$INVERT/g' /home/$USER/scripts/ledstatus/ledstatus.sh"
+if [ $DietPi_ = "NO" ]
+then
+OSV=$(sed 's/\..*//' /etc/debian_version)
+if [ $OSV = 11 ]
+then
+sudo bash -c "sed -i -e 's/sudo python/sudo python3/g' /home/$USER/scripts/ledstatus/ledstatus.sh"
+fi
+fi
 chmod +x /home/$USER/scripts/ledstatus/ledstatus.sh
 echo "Done."
 }
