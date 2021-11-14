@@ -34,6 +34,17 @@ fi
 sleep 2
 fi
 
+if ! [ -x /opt/vc/bin/vcgencmd ]
+then
+echo -e ""
+sudo apt-get install cmake git -y
+git clone https://github.com/raspberrypi/userland
+cd userland
+./buildme
+cd ..
+rm -r -f userland
+fi
+
 function hardware_diy(){
 echo -e "\n\e[95mBuild run-fan.py script :\e[0m"
 MyUser=$USER

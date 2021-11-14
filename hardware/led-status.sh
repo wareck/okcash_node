@@ -21,6 +21,17 @@ echo -e "GPIO Pin     : $GPIO_PIN"
 echo -e "LED inverted : $INVERT"
 fi
 
+if ! [ -x /opt/vc/bin/vcgencmd ]
+then
+echo -e ""
+sudo apt-get install cmake git -y
+git clone https://github.com/raspberrypi/userland
+cd userland
+./buildme
+cd ..
+rm -r -f userland
+fi
+
 if [ -f /boot/dietpi.txt ];then	sudo apt-get install python rpi.gpio -y && DietPi_="YES";else DietPi_="NO";fi
 sleep 1
 MyUser=$USER

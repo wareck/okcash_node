@@ -69,6 +69,16 @@ sudo apt-get -y remove fake-hwclock
 sudo update-rc.d -f fake-hwclock remove
 sudo systemctl disable fake-hwclock || true
 sudo systemctl disable fake-hwclock.service || true
+if ! [ -x /opt/vc/bin/vcgencmd ]
+then
+echo -e ""
+sudo apt-get install cmake git -y
+git clone https://github.com/raspberrypi/userland
+cd userland
+./buildme
+cd ..
+rm -r -f userland
+fi
 echo -e "Done."
 echo -e "\n\e[95mRTC Checks:\e[0m"
 echo -e -n "Internal   time: "
