@@ -1,4 +1,6 @@
-![](https://raw.githubusercontent.com/wareck/okcash_node_raspberry/master/docs/images/logo.png)
+<p align="center">
+<img src="https://raw.githubusercontent.com/wareck/okcash_node_raspberry/master/docs/images/logo.png">
+</p>
 
 ----------
 # Okcash full autonomous node running on Raspberry Pi ##
@@ -29,13 +31,13 @@ Works on Raspberry OS and Dietpi (32bit)
 
 **Okcash** : v6.9.0.5 (Github last official release)
 
-**OpenSSL** :v1.0.2r
+**OpenSSL** :v1.0.2u
 
 **LibBoost** :v1.67.0
 
 **libDB** : v4.8.30.NC
 
-**Miniupnpc** : v2.2.2 
+**Miniupnpc** : v2.2.3 
 
 ----------
 
