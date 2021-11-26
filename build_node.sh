@@ -1,14 +1,14 @@
 #!/bin/bash
 set -e
 Version=5.2
-Release=14/nov/2021
+Release=24/nov/2021
 author=wareck@gmail.com
 
 #Okcash headless RPI Working (sync enable, staking enable)
 #Best results found and last version use for this script are :
 #Boost 1.67 / Openssl 1.0.2r / DB 4.8-30-NC / OkCash git current release (v6.9.0.5)
 
-Okcash_Release=YES #YES is for the last official release version(v6.9.0.5) , NO for last github version (6.9.0.6)
+Okcash_Release=NO #YES = last official release version(v6.9.0.5) , NO = last github dev version (6.9.0.6)
 
 OpenSSL_v=1.0.2u
 Boost_v=1_67_0
@@ -25,7 +25,7 @@ dudp_port=6970 #default remote port
 ############################
 
 #Bootstrap (speedup first start, but requier 2GB free space on sdcard)
-Bootstrap=YES # YES or NO => download bootstrap.dat (take long time to start, but better)
+Bootstrap=NO # YES or NO => download bootstrap.dat (take long time to start, but better)
 
 #Remove tarball after install
 RemoveTarball=NO # YES or NO => remove source files after install (keep space)
@@ -56,7 +56,7 @@ Reboot=YES
 
 ### Main Code ###
 # check size of card:
-SOC=`df | grep /dev/root | awk '{print $4'}` # less than 3.5G free
+SOC=`df | grep /dev/root | awk '{print $4'}`
 if [ $Bootstrap = "YES" ] && ! [ -f .pass ]
 then
 if [ $SOC -le "3000000" ]; then RemoveTarball=YES ;fi
@@ -141,10 +141,6 @@ if [ $Bootstrap = "YES" ] && ! [ -f .pass ]
 then
 if [ $SOC -le 37 ]
 then
-if [ -f /var/swap ]; then sudo dphys-swapfile swapoff && sudo rm /var/swap ; fi
-fi
-if [ $SOC -le 37 ]
-then
 echo ""
 echo "Due to bootstrap file size increase a lot last month"
 echo "Your sdcard is now too small to keep source code."
@@ -153,6 +149,7 @@ echo "Use a bigger scdard to keep sourcefiles on card after compilation"
 echo ""
 fi
 fi
+
 if ps -ef | grep -v grep | grep okcashd >/dev/null
 then
 echo -e "\n\e[38;5;166mOKcash daemon is working => shutdown and will restart after install...\e[0m"
@@ -398,8 +395,6 @@ echo "Done."
 }
 
 function Bootstrap_ {
-sudo dphys-swapfile swapoff &> /dev/null
-if [ -f /var/swap ];then sudo rm /var/swap;fi
 badsum=0
 
 echo -e "\n\e[95mDownload Bootstrap $bt_version ( $bt_parts x $bt_size Mo ):\e[0m"
@@ -412,9 +407,7 @@ bootstrap_address=$(curl -s http://wareck.free.fr/crypto/okcash/bootstrap/bootst
 megadown $bootstrap_address
 LN=$((LN+1))
 done
-
-echo ""
-
+echo -e ""
 for i in `seq -w 001 $bt_parts`;
 do
 wget -c -q --show-progress http://wareck.free.fr/crypto/okcash/bootstrap/bootstrap.$i.md5
@@ -453,8 +446,6 @@ echo -e "\n\e[95mExtract bootstrap.tar.xz:\e[0m"
 sleep 3
 rm bootstrap.7z.*
 echo -e "Done."
-sudo dphys-swapfile setup &> /dev/null
-sudo dphys-swapfile swapon &> /dev/null
 }
 
 function clean_after_install_ {
@@ -645,7 +636,6 @@ if ! grep "#Disable ipv6" /etc/sysctl.conf  >/dev/null
 then
 cp /etc/sysctl.conf /tmp
 cat <<'EOF'>>  /tmp/sysctl.conf
-
 #Disable ipv6
 net.ipv6.conf.all.disable_ipv6=1
 net.ipv6.conf.default.disable_ipv6=1
@@ -661,10 +651,12 @@ fi
 function mkswap {
 if [ $DietPi_ = "NO" ]
 then
-echo -e "\n\e[95mRaspberry optimisation \e[97mSwap:\e[0m"
-sudo bash -c 'sed -i -e "s/CONF_SWAPSIZE=100/CONF_SWAPSIZE=1024/g" /etc/dphys-swapfile'
-sudo dphys-swapfile setup &> /dev/null
-sudo dphys-swapfile swapon &> /dev/null
+echo -e "\n\e[95mRaspberry optimisation \e[97m Disable Swap:\e[0m"
+sudo dphys-swapfile swapoff &> /dev/null
+sudo dphys-swapfile uninstall &> /dev/null
+sudo systemctl disable dphys-swapfile &> /dev/null
+if [ -f /var/swap ]; then sudo rm /var/swap ; fi
+sudo apt-get purge -y dphys-swapfile
 echo -e "Done."
 fi
 }
@@ -788,7 +780,6 @@ sudo ufw --force enable || true
 echo -e "Done."
 }
 
-
 ############
 # Main loop#
 ############
@@ -831,7 +822,6 @@ then
 _IP=$(hostname -I) || true
 echo -e "\e[92mHtml frontend hidden use http://${_IP::-1}:$Website_port to check the webpage \e[0m"
 fi
-
 
 echo -e "\nwareck@gmail.com\n"
 echo -e "Donate:"

@@ -71,9 +71,11 @@ sudo systemctl disable fake-hwclock || true
 sudo systemctl disable fake-hwclock.service || true
 if ! [ -x /opt/vc/bin/vcgencmd ]
 then
-echo -e ""
+echo -e "\n\e[95mBuild userland pack (missing in Raspbian Bullseye):\e[0m"
 sudo apt-get install cmake git -y
+echo -e ""
 git clone https://github.com/raspberrypi/userland
+echo -e ""
 cd userland
 ./buildme
 cd ..
