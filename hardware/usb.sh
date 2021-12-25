@@ -3,7 +3,7 @@ Version=`cat ../build_node.sh | grep -Po "(?<=Version=)([0-9]|\.)*(?=\s|$)"`
 echo -e "\e[93mOkcash Headless Node builder $Version USB Tool\e[0m"
 echo -e "Author : wareck@gmail.com"
 
-part_type=""  #f2fs or ext4
+format_type=""  # format type , can be f2fs or ext4
 
 sda=""
 sdb=""
@@ -17,18 +17,18 @@ sdd=`ls -n /dev/disk/by-uuid/ | grep "sdd" | awk '{print$9}'` >/dev/null
 function error_config {
 echo -e "\nChoose your file filesystem first:"
 echo "nano usb.sh"
-echo "edit part_type=\"f2fs\" for f2fs or part_type=\"ext4\" for ext4 or part_type=\"vfat\" for vfat"
+echo "edit format_type=\"f2fs\" for f2fs or part_type=\"ext4\" for ext4 or part_type=\"vfat\" for vfat"
 echo "save and run again ./usb.sh"
 echo ""
 exit
 }
 
-if [ -z $part_type ]; then error_config && exit ;fi
-if ! [[ $part_type = "f2fs"  ||  $part_type = "ext4" ]]
+if [ -z $format_type ]; then error_config && exit ;fi
+if ! [[ $format_type = "f2fs"  ||  $format_type = "ext4" ]]
 then
-	echo $part_type
+	echo $format_type
 	error_config
-		if [ $part_type = "f2fs" ]
+		if [ $format_type = "f2fs" ]
 			then
 				sudo apt-get install f2fs-tools -y
 			fi
@@ -60,7 +60,7 @@ UUID=SDA  /home/MYUSER/.okcash  FRMT    defaults,noatime  0       1
 EOF
 sed -i "s/SDA/$sda/" /tmp/tmp
 sed -i "s/MYUSER/$USER/" /tmp/tmp
-sed -i "s/FRMT/$part_type/" /tmp/tmp
+sed -i "s/FRMT/$format_type/" /tmp/tmp
 sudo bash -c "cat /tmp/tmp >> /etc/fstab"
 echo -e "\n\e[95mLines added to /etc/fstab:\e[0m"
 tail -n +2 /tmp/tmp

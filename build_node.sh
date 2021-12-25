@@ -8,51 +8,8 @@ author=wareck@gmail.com
 #Best results found and last version use for this script are :
 #Boost 1.67 / Openssl 1.0.2r / DB 4.8-30-NC / OkCash git current release (v6.9.0.5)
 
-Okcash_Release=NO #YES = last official release version(v6.9.0.5) , NO = last github dev version (6.9.0.6)
-
-OpenSSL_v=1.0.2u
-Boost_v=1_67_0
-DB_v=4.8.30.NC
-Miniupnpc_v=2.2.3
-
-Dw=0
-drpc_port=6969 #default rpc port
-dudp_port=6970 #default remote port
-
-
-############################
-##Configuration / options ##
-############################
-
-#Bootstrap (speedup first start, but requier 2GB free space on sdcard)
-Bootstrap=NO # YES or NO => download bootstrap.dat (take long time to start, but better)
-
-#Remove tarball after install
-RemoveTarball=NO # YES or NO => remove source files after install (keep space)
-
-#Optimiser Raspberry (give watchdog function and autostart okcash, speedup a little the raspberry)
-Raspi_optimize=YES
-
-#Website frontend (give a small web page to check if everything is ok)
-Website=YES
-
-#Website port #80 for standard port other port for hiding website
-Website_port=80
-
-#Enable firewall
-Firewall=YES
-
-#Disable Ipv6
-Ipv6=NO
-
-#Enable autostart
-AutoStart=YES
-
-#Login banner
-Banner=YES
-
-#Reboot after build
-Reboot=YES
+#download external config:
+source config
 
 ### Main Code ###
 # check size of card:
@@ -88,7 +45,7 @@ echo $MyUser>/tmp/node_user
 
 Dw=0 #daemon working flag
 
-echo -e "\n\e[93mOkcash Headless Node builder v$Version ($Release)\e[0m"
+echo -e "\e[93mOkcash Headless Node builder v$Version ($Release)\e[0m"
 echo -e "Author : wareck@gmail.com"
 sleep 2
 echo -e "\n\e[97mConfiguration\e[0m"
@@ -107,7 +64,7 @@ echo -e -n "Html port number $Website_port     : \e[38;5;0166mHidden \e[0m"
 fi
 sleep 1
 
-if [ $Okcash_Release = "NO" ]
+if [ $Okcash_dev = "NO" ]
 then
 wget -q -c https://raw.githubusercontent.com/okcashpro/okcash/master/okcash.pro -O /tmp/okcash.pro
 OKcash_v="`cat /tmp/okcash.pro | grep VERSION | awk '{print$3}' | awk '{print $1}' | grep -v '{'`"
@@ -253,14 +210,14 @@ echo -e "Done."
 echo -e "\n\e[95mDownload OkCash $OKcash_v Source Code:\e[0m"
 if ! [ -d $MyDir/okcash ]
 then
-case $Okcash_Release in
-YES)
+case $Okcash_dev in
+NO)
 	git clone -n https://github.com/okcashpro/okcash.git
 	cd okcash
 	git reset --hard e5e70de031de21ba570e6c83ae8c25dd6ef211a3
 	cd ..
 	;;
-NO)
+YES)
 	git clone https://github.com/okcashpro/okcash.git
 	;;
 *)	echo "Error";;
