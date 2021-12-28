@@ -1,0 +1,48 @@
+#config file
+
+Okcash_dev=NO 
+#YES = last official release version(v6.9.0.5) , NO = last github dev version (6.9.0.6)
+
+OpenSSL_v=1.0.2u
+Boost_v=1_67_0
+DB_v=4.8.30.NC
+Miniupnpc_v=2.2.3
+
+Dw=0
+drpc_port=6969 #default rpc port
+dudp_port=6970 #default remote port
+
+
+############################
+##Configuration / options ##
+############################
+
+#Bootstrap (speedup first start, but requier 2GB free space on sdcard)
+Bootstrap=YES # YES or NO => download bootstrap.dat (take long time to start, but better)
+
+#Remove tarball after install
+RemoveTarball=NO # YES or NO => remove source files after install (keep space)
+
+#Optimiser Raspberry (give watchdog function and autostart okcash, speedup a little the raspberry)
+Raspi_optimize=YES
+
+#Website frontend (give a small web page to check if everything is ok)
+Website=YES
+
+#Website port #80 for standard port other port for hiding website
+Website_port=80
+
+#Enable firewall
+Firewall=YES
+
+#Disable Ipv6
+Ipv6=NO
+
+#Enable autostart
+AutoStart=YES
+
+#Login banner
+Banner=YES
+
+#Reboot after build
+Reboot=YES

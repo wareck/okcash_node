@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
-Version=5.2
-Release=24/nov/2021
+Version=6.0
+Release=25/dec/2021
 author=wareck@gmail.com
 
 #Okcash headless RPI Working (sync enable, staking enable)
@@ -63,7 +63,6 @@ then
 echo -e -n "Html port number $Website_port     : \e[38;5;0166mHidden \e[0m"
 fi
 sleep 1
-
 if [ $Okcash_dev = "NO" ]
 then
 wget -q -c https://raw.githubusercontent.com/okcashpro/okcash/master/okcash.pro -O /tmp/okcash.pro
@@ -74,7 +73,6 @@ else
 OKcash_v=6.9.0.5
 Comment="(Release)"
 fi
-
 echo -e "\n\n\e[97mSoftware Release \e[0m"
 echo -e "----------------"
 echo $ident
