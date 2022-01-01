@@ -1,0 +1,49 @@
+#!/bin/false
+#Config file
+
+#Libraraies and external programs version :
+OpenSSL_v=1.0.2u
+Boost_v=1_67_0
+DB_v=4.8.30.NC
+Miniupnpc_v=2.2.3
+
+#############################
+## Configuration / options ##
+#############################
+
+#Release or Developement version
+#YES => release (last "official" version , today is v6.9.05)
+#NO  => last source code (today is git v6.9.0.6)
+Okcash_release=YES
+
+#Rpc communication ports:
+drpc_port=6969 #default rpc port
+dudp_port=6970 #default remote port
+
+#Bootstrap (speedup first start, but requier 4GB free space on sdcard)
+#YES will download my personal backup of blockchain, it will speed up OKcash first start.
+Bootstrap=YES
+
+#Remove tarball after install (it will keep some freespace on the sdcard/usb drive)
+RemoveTarball=NO
+
+#Optimiser Raspberry (give watchdog function and autostart okcash, speedup a little the raspberry)
+Raspi_optimize=YES
+
+#Website frontend (give a small web page to check if everything is ok)
+Website=YES
+
+#Website port 80 for standard html port , or other port if needed
+Website_port=80
+
+#Enable firewall
+Firewall=YES
+
+#Disable Ipv6
+Ipv6=NO
+
+#Login banner (add logo banner at start)
+Banner=YES
+
+#Reboot after build
+Reboot=YES

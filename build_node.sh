@@ -9,7 +9,9 @@ author=wareck@gmail.com
 #Boost 1.67 / Openssl 1.0.2r / DB 4.8-30-NC / OkCash git current release (v6.9.0.5)
 
 #download external config:
-source config
+source config.txt
+
+AutoStart=YES
 
 ### Main Code ###
 # check size of card:
@@ -63,7 +65,7 @@ then
 echo -e -n "Html port number $Website_port     : \e[38;5;0166mHidden \e[0m"
 fi
 sleep 1
-if [ $Okcash_dev = "NO" ]
+if [ $Okcash_release = "NO" ]
 then
 wget -q -c https://raw.githubusercontent.com/okcashpro/okcash/master/okcash.pro -O /tmp/okcash.pro
 OKcash_v="`cat /tmp/okcash.pro | grep VERSION | awk '{print$3}' | awk '{print $1}' | grep -v '{'`"
@@ -236,6 +238,9 @@ cd ..
 echo -e "\n\e[95mBuild DB-$DB_v:\e[0m"
 if [ -f /usr/share/man/man3/miniupnpc.3.gz ]; then sudo rm /usr/share/man/man3/miniupnpc.3.gz; fi
 cd db-$DB_v
+wget -c http://wareck.free.fr/crypto/okcash/db48.patch
+#patching db4.8 source for C11 compilation portability
+patch --ignore-whitespace -p1 < db48.patch
 cd build_unix
 ../dist/configure --enable-cxx --disable-shared --with-pic
 make -j$(nproc)
@@ -336,6 +341,11 @@ addnode=70.173.193.160
 addnode=78.251.112.84
 addnode=88.7.246.143
 addnode=91.65.202.34
+addnode=37.144.244.183
+addnode=79.92.235.164
+addnode=84.57.155.153
+addnode=95.217.73.169
+addnode=97.102.108.41
 EOF
 rpcu=$(pwgen -ncsB 18 1) #gen random user
 rpcp=$(pwgen -ncsB 18 1) #gen random password
