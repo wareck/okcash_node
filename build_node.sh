@@ -365,7 +365,7 @@ badsum=0
 echo -e "\n\e[95mDownload Bootstrap $bt_version ( $bt_parts x $bt_size Mo ):\e[0m"
 folder="bootstrap"
 cd /home/$MyUser
-LN=4 #Start line number
+LN=5 #Start line number
 for i in `seq 1 $bt_parts`;
 do
 bootstrap_address=$(curl -s http://wareck.free.fr/crypto/okcash/bootstrap/bootstrap_v.txt | head -$LN | tail -1)

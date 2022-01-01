@@ -7,7 +7,6 @@
 
 
 This script build "Okcash headless daemon node" (okcashd command line only, for best efficiency) .
-It will make okcashd with static libraries for a better compatibility/efficiency.
 This script will download/compile/configure and build all files autonomously . (it take between 1 and 2 hours)
 I suggest to use Pi3 or Pi4 otherwise, it will take to much time to synchronise and never staking ...
 You can use Raspbian (lite or full, better is to use lite version for efficiency/speed) or DietPi (smaller image, optimized packets)
