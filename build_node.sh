@@ -50,8 +50,8 @@ Dw=0 #daemon working flag
 echo -e "\e[93mOkcash Headless Node builder v$Version ($Release)\e[0m"
 echo -e "Author : wareck@gmail.com"
 sleep 2
-echo -e "\n\e[97mConfiguration\e[0m"
-echo -e "-------------"
+echo -e "\n\e[97mConfiguration:\e[0m"
+echo -e "--------------"
 echo -e -n "Download Bootstrap.dat    : "; if [ $Bootstrap = "YES" ];then echo -e "[\e[92m YES \e[0m]"; else echo -e "[\e[91m NO  \e[0m]";fi
 echo -e -n "Raspberry Optimisation    : "; if [ $Raspi_optimize = "YES" ];then echo -e "[\e[92m YES \e[0m]"; else echo -e "[\e[91m NO  \e[0m]";fi
 echo -e -n "Node message banner       : "; if [ $Banner = "YES" ];then echo -e "[\e[92m YES \e[0m]"; else echo -e "[\e[91m NO  \e[0m]";fi
@@ -65,6 +65,7 @@ then
 echo -e -n "Html port number $Website_port     : \e[38;5;0166mHidden \e[0m"
 fi
 sleep 1
+
 if [ $Okcash_DEV = "YES" ]
 then
 wget -q -c https://raw.githubusercontent.com/okcashpro/okcash/master/okcash.pro -O /tmp/okcash.pro
@@ -75,8 +76,8 @@ else
 OKcash_v=6.9.0.5
 Comment="(Release)"
 fi
-echo -e "\n\n\e[97mSoftware Release \e[0m"
-echo -e "----------------"
+echo -e "\n\e[97mSoftware Release:\e[0m"
+echo -e "-----------------"
 echo $ident
 echo -e "Raspbian Image            : v$LSB ($img_v)"
 echo -e "Boost                     : $Boost_v"
@@ -85,10 +86,12 @@ echo -e "DB Berkeley               : $DB_v"
 echo -e "Miniupnpc                 : $Miniupnpc_v"
 echo -e "Okcash                    : $OKcash_v $Comment"
 
+sleep 2
+
 if [ $Bootstrap = "YES" ]
 then
-echo -e "\n\e[97mBootstrap\e[0m"
-echo -e "---------"
+echo -e "\n\e[97mBootstrap:\e[0m"
+echo -e "----------"
 bt_version="`curl -s http://wareck.free.fr/crypto/okcash/bootstrap/bootstrap_v.txt | awk 'NR==1 {print$3;exit}'`"
 bt_parts="`curl -s http://wareck.free.fr/crypto/okcash/bootstrap/bootstrap_v.txt | awk 'NR==2 {print$2; exit}'`"
 bt_size="`curl -s http://wareck.free.fr/crypto/okcash/bootstrap/bootstrap_v.txt | awk 'NR==3 {print$3; exit}'`"
@@ -111,7 +114,7 @@ if ps -ef | grep -v grep | grep okcashd >/dev/null
 then
 echo -e "\n\e[38;5;166mOKcash daemon is working => shutdown and will restart after install...\e[0m"
 okcashd stop | true
-sudo /etc/init.d/cron stop
+sudo /etc/init.d/cron stop >/dev/null
 sudo killall -9 okcashd | true
 Dw=1
 sudo /etc/init.d/cron stop 2>/dev/null || true
@@ -148,7 +151,7 @@ echo -e -n "Check PWGEN               : "
 if ! [ -x "$(command -v pwgen)" ];then echo -e "[\e[91m NO  \e[0m]" && pwgen_i="pwgen" && update_me=1;else echo -e "[\e[92m YES \e[0m]";fi
 if ! [ -x "$(command -v xxd)" ]; then xxd_i="xxd" && update_me=1;fi
 if ! [ -x "$(command -v htop)" ];then htop_i="htop" && update_me=1;fi
-if ! [ -x "$(command -v dphys-swapfile)" ];then swap_i="dphys-swapfile" && update_me=1 ;fi
+if ! [[ -f .pass  || -x "$(command -v dphys-swapfile)" ]];then swap_i="dphys-swapfile" && update_me=1 ;fi
 if [ $Bootstrap = "YES" ]
 then
 echo -e -n "Check MegaDownload        : "
@@ -300,7 +303,7 @@ Flag="--param ggc-min-expand=1 --param ggc-min-heapsize=32768"
 else
 Flag=""
 fi
-make -j$(nproc) -f makefile.arm CXXFLAGS="$Flag" \
+make -j$(nproc) -w -f makefile.arm CXXFLAGS="$Flag" \
 OPENSSL_LIB_PATH=$MyDir/openssl-$OpenSSL_v OPENSSL_INCLUDE_PATH=$MyDir/openssl-$OpenSSL_v/include BDB_INCLUDE_PATH=/usr/local/BerkeleyDB.4.8/include/ \
 BDB_LIB_PATH=/usr/local/BerkeleyDB.4.8/lib BOOST_LIB_PATH=/usr/local/lib/ BOOST_INCLUDE_PATH=/usr/local/include/boost/ \
 MINIUPNPC_INCLUDE_PATH=/usr/include/miniupnpc MINIUPNPC_LIB_PATH=/usr/lib/
@@ -448,13 +451,13 @@ echo -e "\n\e[95mWebsite Frontend installation:\e[0m"
 OSV=$(sed 's/\..*//' /etc/debian_version)
 case $OSV in
 8)
-sudo apt-get install apache2 php5 php5-xmlrpc curl php5-curl -y;;
+sudo apt-get install apache2 php5 php5-xmlrpc curl php5-curl -y >/dev/null;;
 9)
-sudo apt-get install apache2 php7.0 php7.0-xmlrpc curl php7.0-curl -y ;;
+sudo apt-get install apache2 php7.0 php7.0-xmlrpc curl php7.0-curl -y >/dev/null;;
 10)
-sudo apt-get install apache2 php7.3 php7.3-xmlrpc curl php7.3-curl -y ;;
+sudo apt-get install apache2 php7.3 php7.3-xmlrpc curl php7.3-curl -y >/dev/null;;
 11)
-sudo apt-get install apache2 php7.4 php7.4-xmlrpc php7.4-curl -y ;;
+sudo apt-get install apache2 php7.4 php7.4-xmlrpc php7.4-curl -y >/dev/null;;
 *)
 echo -e "\e[38;5;166mUnknown system, please use Raspberry Stretch , Jessie, Buster or Bullseye image...\e[0m"
 exit 0
@@ -507,16 +510,16 @@ sudo bash -c 'echo "#Okcash frontend website" > /dev/null >>/etc/crontab | sudo 
 sudo bash -c 'form=$(cat "/tmp/node_user") && echo "*/5 *  *   *   *  $form curl -Ssk http://127.0.0.1/stats.php > /dev/null" >>/etc/crontab | sudo -s'
 sudo bash -c 'form=$(cat "/tmp/node_user") && echo "*/5 *  *   *   *  $form curl -Ssk http://127.0.0.1/peercount.php > /dev/null" >>/etc/crontab | sudo -s'
 fi
-sudo /etc/init.d/apache2 restart
+sudo /etc/init.d/apache2 restart >/dev/null
 echo -e "Done."
 }
 
 function Raspberry-optimisation_ {
 echo -e "\n\e[95mRaspberry optimisation \e[97mWatchDog and Autostart:\e[0m"
-sudo apt-get install watchdog chkconfig -y
-sudo chkconfig watchdog on
-sudo /etc/init.d/watchdog start
-sudo update-rc.d watchdog enable
+sudo apt-get install watchdog chkconfig -y >/dev/null
+sudo chkconfig watchdog on >/dev/null
+sudo /etc/init.d/watchdog start >/dev/null
+sudo update-rc.d watchdog enable >/dev/null
 
 if ! [ -f /home/$MyUser/scripts/watchdog_okcash.sh ]
 then
@@ -620,11 +623,11 @@ function mkswap {
 if [ $DietPi_ = "NO" ]
 then
 echo -e "\n\e[95mRaspberry optimisation \e[97m Disable Swap:\e[0m"
-sudo dphys-swapfile swapoff &> /dev/null
-sudo dphys-swapfile uninstall &> /dev/null
-sudo systemctl disable dphys-swapfile &> /dev/null
+sudo dphys-swapfile swapoff > /dev/null
+sudo dphys-swapfile uninstall > /dev/null
+sudo systemctl disable dphys-swapfile > /dev/null
 if [ -f /var/swap ]; then sudo rm /var/swap ; fi
-sudo apt-get purge -y dphys-swapfile
+sudo apt-get purge -y dphys-swapfile > /dev/null
 echo -e "Done."
 fi
 }
@@ -775,7 +778,7 @@ if [ $RemoveTarball = "YES" ]; then clean_after_install_;fi
 if [ $Raspi_optimize = "YES" ]
 then
 Raspberry-optimisation_
-sudo /etc/init.d/cron stop #add this to prevent accidental restart during bootstrap download process
+sudo /etc/init.d/cron stop >/dev/null #add this to prevent accidental restart during bootstrap download process
 fi
 
 if [ $Bootstrap = "YES" ] ; then Bootstrap_ ;fi
@@ -802,7 +805,7 @@ echo -e ""
 if [ $Dw = 1 ]
 then
 okcashd
-sudo bash -c 'sudo /etc/init.d/cron restart'
+sudo bash -c 'sudo /etc/init.d/cron restart >/dev/null'
 fi
 
 if [ $Raspi_optimize = "YES" ]
