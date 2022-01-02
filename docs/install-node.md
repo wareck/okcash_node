@@ -12,7 +12,7 @@ When logged into Raspberry start by an update upgrade :
 
     sudo apt-get update -y
     sudo apt-get upgrade -y
-  
+
 Then add essentials tools for starting :
 
     sudo apt-get install git -y
@@ -30,8 +30,8 @@ Step 2 : ***reboot and login again***
 Step 3 : ***clone github folder :***
 
 	cd /home/pi
-	git clone https://github.com/wareck/okcash_node_raspberry.git 
-	cd /home/pi/okcash_node_raspberry
+	git clone https://github.com/wareck/okcash_node.git 
+	cd /home/pi/okcash_node
 
 Step 4 : ***If you wants to use an USB key*** :
 
@@ -39,9 +39,9 @@ Plug you key in your raspberry pi now, (must be formated in EXT4 or F2FS)
 
 Now prepare you raspberry to use usb key as okcash folder :
 
-    
+    cd hardware
     nano usb.sh
-    
+
 edit the line 
 
 	part_type=""  #f2fs or ext4
@@ -62,12 +62,12 @@ Step 5 : ***reboot and login again***
 Launch build scrypt :
 
 	cd /home/pi
-	cd /home/pi/okcash_node_raspberry
+	cd /home/pi/okcash_node
 
 You can edit options :
 
-    nano build_node.sh
-    
+    nano config.txt
+
 
 ***Configuration options :***
 
