@@ -210,14 +210,14 @@ echo -e "Done."
 echo -e "\n\e[95mDownload OkCash $OKcash_v Source Code:\e[0m"
 if ! [ -d $MyDir/okcash ]
 then
-case $Okcash_dev in
-NO)
+case $Okcash_release in
+YES)
 	git clone -n https://github.com/okcashpro/okcash.git
 	cd okcash
 	git reset --hard e5e70de031de21ba570e6c83ae8c25dd6ef211a3
 	cd ..
 	;;
-YES)
+NO)
 	git clone https://github.com/okcashpro/okcash.git
 	;;
 *)	echo "Error";;
@@ -238,9 +238,12 @@ cd ..
 echo -e "\n\e[95mBuild DB-$DB_v:\e[0m"
 if [ -f /usr/share/man/man3/miniupnpc.3.gz ]; then sudo rm /usr/share/man/man3/miniupnpc.3.gz; fi
 cd db-$DB_v
+if ! [ -f db48.patch ]
+then
 wget -c http://wareck.free.fr/crypto/okcash/db48.patch
 #patching db4.8 source for C11 compilation portability
 patch --ignore-whitespace -p1 < db48.patch
+fi
 cd build_unix
 ../dist/configure --enable-cxx --disable-shared --with-pic
 make -j$(nproc)
