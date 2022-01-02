@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
-Version=6.0
-Release=25/dec/2021
+Version=6.1
+Release=01/01/2022
 author=wareck@gmail.com
 
 #Okcash headless RPI Working (sync enable, staking enable)
@@ -65,7 +65,7 @@ then
 echo -e -n "Html port number $Website_port     : \e[38;5;0166mHidden \e[0m"
 fi
 sleep 1
-if [ $Okcash_release = "NO" ]
+if [ $Okcash_DEV = "YES" ]
 then
 wget -q -c https://raw.githubusercontent.com/okcashpro/okcash/master/okcash.pro -O /tmp/okcash.pro
 OKcash_v="`cat /tmp/okcash.pro | grep VERSION | awk '{print$3}' | awk '{print $1}' | grep -v '{'`"
@@ -210,7 +210,7 @@ echo -e "Done."
 echo -e "\n\e[95mDownload OkCash $OKcash_v Source Code:\e[0m"
 if ! [ -d $MyDir/okcash ]
 then
-case $Okcash_release in
+case $Okcash_DEV in
 YES)
 	git clone -n https://github.com/okcashpro/okcash.git
 	cd okcash
@@ -300,7 +300,7 @@ Flag="--param ggc-min-expand=1 --param ggc-min-heapsize=32768"
 else
 Flag=""
 fi
-make  -f makefile.arm CXXFLAGS="$Flag" \
+make -j$(nproc) -f makefile.arm CXXFLAGS="$Flag" \
 OPENSSL_LIB_PATH=$MyDir/openssl-$OpenSSL_v OPENSSL_INCLUDE_PATH=$MyDir/openssl-$OpenSSL_v/include BDB_INCLUDE_PATH=/usr/local/BerkeleyDB.4.8/include/ \
 BDB_LIB_PATH=/usr/local/BerkeleyDB.4.8/lib BOOST_LIB_PATH=/usr/local/lib/ BOOST_INCLUDE_PATH=/usr/local/include/boost/ \
 MINIUPNPC_INCLUDE_PATH=/usr/include/miniupnpc MINIUPNPC_LIB_PATH=/usr/lib/
