@@ -4,3 +4,4 @@ miniupnpc-*
 openssl-*
 okcash
 .pass
+hardware/.rtc
