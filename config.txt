@@ -12,8 +12,8 @@ Miniupnpc_v=2.2.3
 #############################
 
 #Release or Developement version
-#NO => release (last "official" version , today is v6.9.05)
-#YES  => last source code (today is git v6.9.0.6)
+#NO => release (last "official" version , today is v6.9.0.5)
+#YES  => last source code (today is git v6.9.0.7)
 Okcash_DEV=NO
 
 #Rpc communication ports:
