@@ -214,13 +214,13 @@ echo -e "\n\e[95mDownload OkCash $OKcash_v Source Code:\e[0m"
 if ! [ -d $MyDir/okcash ]
 then
 case $Okcash_DEV in
-YES)
+NO)
 	git clone -n https://github.com/okcashpro/okcash.git
 	cd okcash
 	git reset --hard e5e70de031de21ba570e6c83ae8c25dd6ef211a3
 	cd ..
 	;;
-NO)
+YES)
 	git clone https://github.com/okcashpro/okcash.git
 	;;
 *)	echo "Error";;
@@ -338,20 +338,36 @@ port=dudp_port
 #datadir=/home/USER/.okcash
 
 #Add extra Nodes
-addnode=187.49.114.226
-addnode=189.167.218.202
-addnode=213.195.106.99
-addnode=216.186.228.186
-addnode=37.133.16.214
-addnode=70.173.193.160
-addnode=78.251.112.84
-addnode=88.7.246.143
-addnode=91.65.202.34
-addnode=37.144.244.183
-addnode=79.92.235.164
-addnode=84.57.155.153
-addnode=95.217.73.169
-addnode=97.102.108.41
+addnode=103.81.194.78
+addnode=104.229.10.238
+addnode=108.61.197.20
+addnode=121.200.29.57
+addnode=13.209.243.246
+addnode=13.209.60.161
+addnode=136.143.149.184
+addnode=137.186.12.70
+addnode=146.212.70.130
+addnode=154.16.192.76
+addnode=172.93.132.172
+addnode=185.159.157.44
+addnode=185.224.134.45
+addnode=189.174.136.225
+addnode=189.40.108.199
+addnode=200.217.138.157
+addnode=212.102.54.166
+addnode=213.232.87.62
+addnode=23.227.150.229
+addnode=23.97.222.172
+addnode=34.126.107.138
+addnode=34.80.252.109
+addnode=34.81.157.246
+addnode=45.82.164.199
+addnode=67.218.240.215
+addnode=84.247.48.166
+addnode=86.45.85.176
+addnode=91.139.203.62
+addnode=97.123.83.144
+addnode=98.250.175.53
 EOF
 rpcu=$(pwgen -ncsB 18 1) #gen random user
 rpcp=$(pwgen -ncsB 18 1) #gen random password
