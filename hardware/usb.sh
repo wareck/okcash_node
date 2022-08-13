@@ -1,9 +1,73 @@
 #!/bin/bash
+set -e
 Version=`cat ../build_node.sh | grep -Po "(?<=Version=)([0-9]|\.)*(?=\s|$)"`
 echo -e "\e[93mOkcash Headless Node builder $Version USB Tool\e[0m"
 echo -e "Author : wareck@gmail.com"
 
-format_type=""  # format type , can be f2fs or ext4
+function check {
+drive=`sudo lsblk -d |grep sda | awk {'print$1'}`
+format=`sudo lsblk -f /dev/$drive -n -o FSTYPE | grep -v '^$'`
+
+if [ "$format" = "" ];then format="not formated";fi
+
+echo -e "Usb drive detected : \e[97m$drive\e[0m"
+echo -e "format type : \e[97m$format\e[0m"
+if [ "$format" = "" ]
+then
+echo "Drive not formated, please read DOC.."
+echo "Use cfdisk and mkfs to format drive."
+exit 0
+fi
+if [ $format = "ext3" ]
+then
+echo "Drive formated with ext3 and is obsolete, please read DOC.."
+echo "Use cfdisk and mkfs to format drive in ext4 or f2fs."
+exit 0
+fi
+echo ""
+if [ $format = "ntfs" ]
+then
+echo "Drive formated with NTFS, it will works but not efficient"
+echo "Use cfdisk and mkfs to format drive in ext4 or f2fs."
+exit 0
+fi
+
+sda=`ls -n /dev/disk/by-uuid/ | grep "sda" | awk '{print$9}'` >/dev/null
+sdb=`ls -n /dev/disk/by-uuid/ | grep "sdb" | awk '{print$9}'` >/dev/null
+sdc=`ls -n /dev/disk/by-uuid/ | grep "sdc" | awk '{print$9}'` >/dev/null
+sdd=`ls -n /dev/disk/by-uuid/ | grep "sdd" | awk '{print$9}'` >/dev/null
+
+if  grep -q $sda /etc/fstab
+then
+echo -e "Already configured in /etc/fstab"
+echo -e "Edit and double check /etc/fstab file\n"
+exit 0
+fi
+main
+}
+
+function main {
+PS3='
+Please enter your choice: '
+options=("Check again" "Continue" "Quit")
+select opt in "${options[@]}"
+do
+    case $opt in
+        "Check again")
+            check
+            break
+            ;;
+        "Continue")
+            break
+            ;;
+        "Quit")
+            exit 0 && break
+            ;;
+        *) echo invalid option;;
+    esac
+done
+
+format_type="$format"  # format type , can be f2fs or ext4
 
 sda=""
 sdb=""
@@ -13,6 +77,9 @@ sda=`ls -n /dev/disk/by-uuid/ | grep "sda" | awk '{print$9}'` >/dev/null
 sdb=`ls -n /dev/disk/by-uuid/ | grep "sdb" | awk '{print$9}'` >/dev/null
 sdc=`ls -n /dev/disk/by-uuid/ | grep "sdc" | awk '{print$9}'` >/dev/null
 sdd=`ls -n /dev/disk/by-uuid/ | grep "sdd" | awk '{print$9}'` >/dev/null
+install
+}
+
 
 function error_config {
 echo -e "\nChoose your file filesystem first:"
@@ -23,6 +90,7 @@ echo ""
 exit
 }
 
+function install {
 if [ -z $format_type ]; then error_config && exit ;fi
 if ! [[ $format_type = "f2fs"  ||  $format_type = "ext4" ]]
 then
@@ -101,3 +169,7 @@ echo -e "\e[95mDirectory Check:\e[0m"
 ls -w 2 /home/$USER/.okcash
 echo -e "\nDone."
 echo -e
+}
+
+
+check
