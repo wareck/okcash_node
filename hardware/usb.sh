@@ -4,6 +4,13 @@ Version=`cat ../build_node.sh | grep -Po "(?<=Version=)([0-9]|\.)*(?=\s|$)"`
 echo -e "\e[93mOkcash Headless Node builder $Version USB Tool\e[0m"
 echo -e "Author : wareck@gmail.com"
 
+function update_ {
+if ! [ -x "$(command -v mkfs.f2fs)" ];then a="f2fs-tools";fi
+if ! [ -x "$(command -v btrfs)" ];then b="btrfs-progs";fi
+if ! [ -x "$(command -v mkfs.ntfs)" ];then c="ntfs-3g";fi
+sudo apt-get install $a $b $c -y -qq
+}
+
 function check {
 drive=`sudo lsblk -d |grep sda | awk {'print$1'}`
 format=`sudo lsblk -f /dev/$drive -n -o FSTYPE | grep -v '^$'`
@@ -18,7 +25,7 @@ echo "Drive not formated, please read DOC.."
 echo "Use cfdisk and mkfs to format drive."
 exit 0
 fi
-if [ $format = "ext3" ]
+if [ $format = "ext4" ]
 then
 echo "Drive formated with ext3 and is obsolete, please read DOC.."
 echo "Use cfdisk and mkfs to format drive in ext4 or f2fs."
@@ -171,5 +178,5 @@ echo -e "\nDone."
 echo -e
 }
 
-
+update_
 check

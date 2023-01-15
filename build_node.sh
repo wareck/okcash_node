@@ -1,12 +1,12 @@
 #!/bin/bash
 set -e
-Version=6.2
-Release=01/08/2022
+Version=6.3
+Release=15/01/2023
 author=wareck@gmail.com
 
 #Okcash headless RPI Working (sync enable, staking enable)
 #Best results found and last version use for this script are :
-#Boost 1.67 / Openssl 1.0.2r / DB 4.8-30-NC / OkCash git current release (v6.9.0.5)
+#Boost 1.67 / Openssl 1.0.2n / DB 4.8-30 / OkCash git current release (v7.0.0.0)
 
 #download external config:
 source config.txt
@@ -16,10 +16,6 @@ AutoStart=YES
 ### Main Code ###
 # check size of card:
 SOC=`df | grep /dev/root | awk '{print $4'}`
-if [ $Bootstrap = "YES" ] && ! [ -f .pass ]
-then
-if [ $SOC -le "3000000" ]; then RemoveTarball=YES ;fi
-fi
 if [ -f /boot/dietpi.txt ]
 then
 LSB=$(cat /etc/debian_version)
@@ -58,7 +54,6 @@ echo -e -n "Node message banner       : "; if [ $Banner = "YES" ];then echo -e "
 echo -e -n "Okcash autostart at boot  : "; if [ $AutoStart = "YES" ];then echo -e "[\e[92m YES \e[0m]"; else echo -e "[\e[91m NO  \e[0m]";fi
 echo -e -n "Website Frontend          : "; if [ $Website = "YES" ];then echo -e "[\e[92m YES \e[0m]"; else echo -e "[\e[91m NO  \e[0m]";fi
 echo -e -n "Firewall enable           : "; if [ $Firewall = "YES" ];then echo -e "[\e[92m YES \e[0m]"; else echo -e "[\e[91m NO  \e[0m]";fi
-echo -e -n "Keep sources after build  : "; if [ $RemoveTarball = "NO" ];then echo -e "[\e[92m YES \e[0m]"; else echo -e "[\e[91m NO  \e[0m]";fi
 echo -e -n "Reboot when finish build  : "; if [ $Reboot = "YES" ];then echo -e "[\e[92m YES \e[0m]"; else echo -e "[\e[91m NO  \e[0m]";fi
 if [ $Website = "YES" ] && [ ! $Website_port = "80" ]
 then
@@ -73,7 +68,7 @@ OKcash_v="`cat /tmp/okcash.pro | grep VERSION | awk '{print$3}' | awk '{print $1
 rm /tmp/okcash.pro
 Comment="(Source from github dev)"
 else
-OKcash_v=6.9.0.5
+OKcash_v=6.9.0.7-aether
 Comment="(Release)"
 fi
 echo -e "\n\e[97mSoftware Release:\e[0m"
@@ -217,7 +212,7 @@ case $Okcash_DEV in
 NO)
 	git clone -n https://github.com/okcashpro/okcash.git
 	cd okcash
-	git reset --hard e5e70de031de21ba570e6c83ae8c25dd6ef211a3
+	git reset --hard 06c076698cb8565e624667fede6688fa562b8054
 	cd ..
 	;;
 YES)
@@ -303,7 +298,7 @@ Flag="--param ggc-min-expand=1 --param ggc-min-heapsize=32768"
 else
 Flag=""
 fi
-make -j$(nproc) -w -f makefile.arm CXXFLAGS="$Flag" \
+make -j$(nproc) -w -f makefile.arm CXXFLAGS="$Flag -fcommon -w" \
 OPENSSL_LIB_PATH=$MyDir/openssl-$OpenSSL_v OPENSSL_INCLUDE_PATH=$MyDir/openssl-$OpenSSL_v/include BDB_INCLUDE_PATH=/usr/local/BerkeleyDB.4.8/include/ \
 BDB_LIB_PATH=/usr/local/BerkeleyDB.4.8/lib BOOST_LIB_PATH=/usr/local/lib/ BOOST_INCLUDE_PATH=/usr/local/include/boost/ \
 MINIUPNPC_INCLUDE_PATH=/usr/include/miniupnpc MINIUPNPC_LIB_PATH=/usr/lib/
@@ -323,7 +318,7 @@ daemon=1
 listen=1
 staking=1
 enableaccounts=1
-maxconnections=15
+maxconnections=10
 
 #Connection User and Password
 rpcuser=user
@@ -790,7 +785,6 @@ Build_Okcash_
 conf_
 
 if [ $Website = "YES" ];then install_website_ ;fi
-if [ $RemoveTarball = "YES" ]; then clean_after_install_;fi
 if [ $Raspi_optimize = "YES" ]
 then
 Raspberry-optimisation_
