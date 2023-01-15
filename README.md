@@ -28,13 +28,13 @@ Works on Raspberry OS and Dietpi (32bit)
 
 **Actual softwares/libraries versions :**
 
-**Okcash** : v6.9.0.5 (Github last official release)
+**Okcash** : v7.0.0.0 (Github last official release)
 
-**OpenSSL** :v1.0.2u
+**OpenSSL** :v1.0.2n
 
 **LibBoost** :v1.67.0
 
-**libDB** : v4.8.30.NC
+**libDB** : v4.8.30
 
 **Miniupnpc** : v2.2.3 
 
