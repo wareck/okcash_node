@@ -33,7 +33,8 @@ echo -e "\n\e[95mBuild userland pack (missing in Raspbian Bullseye):\e[0m"
 #./buildme
 #cd ..
 #rm -r -f userland
-sudo dpkg -r ../files/userland_1.51-1_armhf.deb
+sudo dpkg -i ../files/userland_1.51-1_armhf.deb
+rm -r -f userland
 fi
 
 if [ -f /boot/dietpi.txt ];then	sudo apt-get install python rpi.gpio -y && DietPi_="YES";else DietPi_="NO";fi

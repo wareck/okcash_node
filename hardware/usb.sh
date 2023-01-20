@@ -8,24 +8,27 @@ function update_ {
 if ! [ -x "$(command -v mkfs.f2fs)" ];then a="f2fs-tools";fi
 if ! [ -x "$(command -v btrfs)" ];then b="btrfs-progs";fi
 if ! [ -x "$(command -v mkfs.ntfs)" ];then c="ntfs-3g";fi
-sudo apt-get install $a $b $c -y -qq
+if ! [ -x "$(command -v mkfs.xfs)" ];then d="xfsprogs";fi
+if ! [[ -z $d || -z $b || -z $c || -z $d ]]
+then
+sudo apt-get install $a $b $c $d -y -qq
+fi
 }
 
-function check {
+function check_ {
 drive=`sudo lsblk -d |grep sda | awk {'print$1'}`
-format=`sudo lsblk -f /dev/$drive -n -o FSTYPE | grep -v '^$'`
-
-if [ "$format" = "" ];then format="not formated";fi
+format=`sudo lsblk -f /dev/$drive -n -o FSTYPE | grep -v '^$'` #| if [ $? = 1 ]; then unset format ; fi
 
 echo -e "Usb drive detected : \e[97m$drive\e[0m"
 echo -e "format type : \e[97m$format\e[0m"
-if [ "$format" = "" ]
+
+if [ -z $format ]
 then
 echo "Drive not formated, please read DOC.."
 echo "Use cfdisk and mkfs to format drive."
 exit 0
 fi
-if [ $format = "ext4" ]
+if [ $format = "ext3" ]
 then
 echo "Drive formated with ext3 and is obsolete, please read DOC.."
 echo "Use cfdisk and mkfs to format drive in ext4 or f2fs."
@@ -36,6 +39,12 @@ if [ $format = "ntfs" ]
 then
 echo "Drive formated with NTFS, it will works but not efficient"
 echo "Use cfdisk and mkfs to format drive in ext4 or f2fs."
+exit 0
+fi
+if [ $format = "vfat" ]
+then
+echo "Drive formated with vfat, it will works but not efficient"
+echo "Use cfdisk and mkfs to format drive in ext4, btrfs or f2fs ."
 exit 0
 fi
 
@@ -74,7 +83,7 @@ do
     esac
 done
 
-format_type="$format"  # format type , can be f2fs or ext4
+format_type="$format"  # format type , can be f2fs,ext4,btrfs,xfs,vfat,ntfs
 
 sda=""
 sdb=""
@@ -84,7 +93,7 @@ sda=`ls -n /dev/disk/by-uuid/ | grep "sda" | awk '{print$9}'` >/dev/null
 sdb=`ls -n /dev/disk/by-uuid/ | grep "sdb" | awk '{print$9}'` >/dev/null
 sdc=`ls -n /dev/disk/by-uuid/ | grep "sdc" | awk '{print$9}'` >/dev/null
 sdd=`ls -n /dev/disk/by-uuid/ | grep "sdd" | awk '{print$9}'` >/dev/null
-install
+install_
 }
 
 
@@ -97,16 +106,12 @@ echo ""
 exit
 }
 
-function install {
+function install_ {
 if [ -z $format_type ]; then error_config && exit ;fi
-if ! [[ $format_type = "f2fs"  ||  $format_type = "ext4" ]]
+if ! [[ $format_type = "f2fs"  ||  $format_type = "ext4" || $format_type = "btrfs" || $format_type = "xfs" ]]
 then
-	echo $format_type
-	error_config
-		if [ $format_type = "f2fs" ]
-			then
-				sudo apt-get install f2fs-tools -y
-			fi
+echo "Unsuported Format"
+echo "use cfdisk to format drive"
 fi
 
 if  [ -z $sda ];then sda_p=0; else sda_p=1;fi
@@ -179,4 +184,4 @@ echo -e
 }
 
 update_
-check
+check_
