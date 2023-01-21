@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
-Version=6.3
-Release=15/01/2023
+Version=6.4
+Release=22/01/2023
 author=wareck@gmail.com
 
 #Okcash headless RPI Working (sync enable, staking enable)
@@ -152,7 +152,7 @@ then
 echo -e -n "Check MegaDownload        : "
 if ! [ -x "$(command -v megadown)" ]
 then echo -e "[\e[91m NO  \e[0m]"
-curl -LJO --silent https://github.com/wareck/megadown/releases/download/v1.0/megadown.tar.bz2
+curl -LJO --silent https://github.com/wareck/sources/megadown/releases/download/v1.0/megadown.tar.bz2
 tar xfj megadown.tar.bz2
 sudo mv megadown /usr/local/bin
 rm megadown.tar.bz2
@@ -176,7 +176,7 @@ function Download_Extract_ {
 echo -e "\n\e[95mDownload/Extract Boost Library:\e[0m"
 if ! [ -d $MyDir/boost_$Boost_v ]
 then
-	wget -c -q --show-progress http://wareck.free.fr/crypto/okcash/boost_$Boost_v.tar.xz
+	wget -c -q --show-progress http://wareck.free.fr/crypto/okcash/sources/boost_$Boost_v.tar.xz
 	tar xfJ boost_$Boost_v.tar.xz --checkpoint=.500
 fi
 echo -e "Done."
@@ -184,7 +184,7 @@ echo -e "Done."
 echo -e "\n\e[95mDownload/Extract OpenSSL Library:\e[0m"
 if ! [ -d $MyDir/openssl-$OpenSSL_v ]
 then
-	wget -c -q --show-progress http://wareck.free.fr/crypto/okcash/openssl-$OpenSSL_v.tar.xz
+	wget -c -q --show-progress http://wareck.free.fr/crypto/okcash/sources/openssl-$OpenSSL_v.tar.xz
 	tar xfJ openssl-$OpenSSL_v.tar.xz --checkpoint=.100
 fi
 echo -e "Done."
@@ -192,7 +192,7 @@ echo -e "Done."
 echo -e "\n\e[95mDonwload/Extract Miniupnpc Library:\e[0m"
 if ! [ -d $MyDir/miniupnpc-$Miniupnpc_v ]
 then
-	wget -c -q --show-progress http://wareck.free.fr/crypto/okcash/miniupnpc-$Miniupnpc_v.tar.xz
+	wget -c -q --show-progress http://wareck.free.fr/crypto/okcash/sources/miniupnpc-$Miniupnpc_v.tar.xz
 	tar xfJ miniupnpc-$Miniupnpc_v.tar.xz --checkpoint=.1
 fi
 echo -e "Done."
@@ -200,7 +200,7 @@ echo -e "Done."
 echo -e "\n\e[95mDownload/Extract db-4.8.30.NC Library:\e[0m"
 if ! [ -d $MyDir/db-$DB_v ]
 then
-	wget -c -q --show-progress http://wareck.free.fr/crypto/okcash/db-$DB_v.tar.xz
+	wget -c -q --show-progress http://wareck.free.fr/crypto/okcash/sources/db-$DB_v.tar.xz
 	tar xfJ db-$DB_v.tar.xz --checkpoint=.100
 fi
 echo -e "Done."
