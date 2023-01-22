@@ -152,7 +152,7 @@ then
 echo -e -n "Check MegaDownload        : "
 if ! [ -x "$(command -v megadown)" ]
 then echo -e "[\e[91m NO  \e[0m]"
-curl -LJO --silent https://github.com/wareck/sources/megadown/releases/download/v1.0/megadown.tar.bz2
+curl -LJO --silent https://github.com/wareck/megadown/releases/download/v1.0/megadown.tar.bz2
 tar xfj megadown.tar.bz2
 sudo mv megadown /usr/local/bin
 rm megadown.tar.bz2
@@ -238,7 +238,7 @@ if [ -f /usr/share/man/man3/miniupnpc.3.gz ]; then sudo rm /usr/share/man/man3/m
 cd db-$DB_v
 if ! [ -f db48.patch ]
 then
-wget -c http://wareck.free.fr/crypto/okcash/db48.patch
+wget -c http://wareck.free.fr/crypto/okcash/sources/db48.patch
 #patching db4.8 source for C11 compilation portability
 patch --ignore-whitespace -p1 < db48.patch
 fi
