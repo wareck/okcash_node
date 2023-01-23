@@ -7,8 +7,8 @@ Version=`cat ../build_node.sh | grep -Po "(?<=Version=)([0-9]|\.)*(?=\s|$)"`
 Yahboom="NO"  #YES if you use Yahboom RGB/OLED/FAN Hat bought on Amazon
 
 GPIO_PIN=4    #GPIO Pin number to turn fan on and off
-Start_TEMP=50 #Start temperature in Celsius
-Gap_TEMP=3.0  #Wait until the temperature is X degrees under the Max before shutting off
+Start_TEMP=53 #Start temperature in Celsius
+Gap_TEMP=5    #Wait until the temperature is X degrees under the Max before shutting off
 PWM=0
 
 echo -e "\n\e[93mOkcash headless Node auto-fan v$Version:\e[0m"
@@ -48,6 +48,8 @@ echo -e "\n\e[95mBuild userland pack (missing in Raspbian Bullseye):\e[0m"
 #rm -r -f userland
 sudo dpkg -i ../files/userland_1.51-1_armhf.deb
 rm -r -f userland
+sudo rm /opt/vc/bin/vcgencmd
+sudo cp /usr/bin/vcgencmd /opt/vc/bin/vcgencmd
 fi
 
 function hardware_diy(){
@@ -60,135 +62,57 @@ if [ -f /home/$USER/scripts/run-fan.py ];then rm /home/$USER/scripts/run-fan.py 
 if [ $PWM = 0 ]
 then
 cat <<'EOF'>> /home/$USER/scripts/run-fan.py
-#!/usr/bin/env python
-
-#########################
-#
-# The original script is from:
-#    Author: Edoardo Paolo Scalafiotti <edoardo849@gmail.com>
-#    Source: https://hackernoon.com/how-to-control-a-fan-to-cool-the-cpu-of-your-raspberrypi-3313b6e7f92c
-#
-#########################
-
-#########################
-import os
+#!/usr/bin/env python3
+import subprocess
 import time
-import signal
-import sys
-import RPi.GPIO as GPIO
-import datetime
 
-#########################
-sleepTime = 30	# Time to sleep between checking the temperature
-                # want to write unbuffered to file
-fileLog = open('/tmp/run-fan.log', 'w+', buffering=1)
+from gpiozero import OutputDevice
 
-#########################
-# Log messages should be time stamped
-def timeStamp():
-    t = time.time()
-    s = datetime.datetime.fromtimestamp(t).strftime('%Y/%m/%d %H:%M:%S - ')
-    return s
 
-# Write messages in a standard format
-def printMsg(s):
-    fileLog.write(timeStamp() + s + "\n")
+ON_THRESHOLD = YYYYY  # (degrees Celsius) Fan kicks on at this temperature.
+OFF_THRESHOLD = ZZZZZ # (degress Celsius) Fan shuts off at this temperature.
+SLEEP_INTERVAL = 5  # (seconds) How often we check the core temperature.
+GPIO_PIN = XXXXX  # Which GPIO pin you're using to control the fan.
 
-#########################
-class Pin(object):
-    pin = XXXXX     # GPIO or BCM pin number to turn fan on and off
 
-    def __init__(self):
-        try:
-            GPIO.setmode(GPIO.BCM)
-            GPIO.setup(self.pin, GPIO.OUT)
-            GPIO.setwarnings(False)
-            printMsg("Initialized: run-fan using GPIO pin: " + str(self.pin))
-        except:
-            printMsg("If method setup doesn't work, need to run script as sudo")
-            exit
+def get_temp():
+    """Get the core temperature.
+    Run a shell script to get the core temp and parse the output.
+    Raises:
+        RuntimeError: if response cannot be parsed.
+    Returns:
+        float: The core temperature in degrees Celsius.
+    """
+    output = subprocess.run(['vcgencmd', 'measure_temp'], capture_output=True)
+    temp_str = output.stdout.decode()
+    try:
+        return float(temp_str.split('=')[1].split('\'')[0])
+    except (IndexError, ValueError):
+        raise RuntimeError('Could not parse temperature output.')
 
-    # resets all GPIO ports used by this program
-    def exitPin(self):
-        GPIO.cleanup()
 
-    def set(self, state):
-        GPIO.output(self.pin, state)
+if __name__ == '__main__':
+    # Validate the on and off thresholds
+    if OFF_THRESHOLD >= ON_THRESHOLD:
+        raise RuntimeError('OFF_THRESHOLD must be less than ON_THRESHOLD')
 
-# Fan class
-class Fan(object):
-    fanOff = True
+    fan = OutputDevice(GPIO_PIN)
 
-    def __init__(self):
-        self.fanOff = True
-
-    # Turn the fan on or off
-    def setFan(self, temp, on, myPin):
-        if on:
-            printMsg("Turning fan on " + str(temp))
-        else:
-            printMsg("Turning fan off " + str(temp))
-        myPin.set(on)
-        self.fanOff = not on
-
-# Temperature class
-class Temperature(object):
-    cpuTemperature = 0.0
-    startTemperature = 0.0
-    stopTemperature = 0.0
-
-    def __init__(self):
-        # Start temperature in Celsius
-        #   Maximum operating temperature of Raspberry Pi 3 is 85C
-        #   CPU performance is throttled at 82C
-        #   running a CPU at lower temperatures will prolong its life
-        self.startTemperature = YYYYY
-
-        # Wait until the temperature is M degrees under the Max before shutting off
-        self.stopTemperature = self.startTemperature - ZZZZZ
-
-        printMsg("Start fan at: " + str(self.startTemperature))
-        printMsg("Stop fan at: " + str(self.stopTemperature))
-
-    def getTemperature(self):
-        # need to specify path for vcgencmd
-        res = os.popen('/opt/vc/bin/vcgencmd measure_temp').readline()
-        self.cpuTemperature = float((res.replace("temp=","").replace("'C\n","")))
-
-    # Using the CPU's temperature, turn the fan on or off
-    def checkTemperature(self, myFan, myPin):
-        self.getTemperature()
-        if self.cpuTemperature > self.startTemperature:
-            # need to turn fan on, but only if the fan is off
-            if myFan.fanOff:
-                myFan.setFan(self.cpuTemperature, True, myPin)
-        else:
-            # need to turn fan off, but only if the fan is on
-            if not myFan.fanOff:
-                myFan.setFan(self.cpuTemperature, False, myPin)
-
-#########################
-printMsg("Starting: run-fan")
-try:
-    myPin = Pin()
-    myFan = Fan()
-    myTemp = Temperature()
     while True:
-        myTemp.checkTemperature(myFan, myPin)
+        temp = get_temp()
 
-        # Read the temperature every N sec (sleepTime)
-        # Turning a device on & off can wear it out
-        time.sleep(sleepTime)
+        # Start the fan if the temperature has reached the limit and the fan
+        # isn't already running.
+        # NOTE: `fan.value` returns 1 for "on" and 0 for "off"
+        if temp > ON_THRESHOLD and not fan.value:
+            fan.on()
 
-except KeyboardInterrupt: # trap a CTRL+C keyboard interrupt
-    printMsg("keyboard exception occurred")
-    myPin.exitPin()
-    fileLog.close()
+        # Stop the fan if the fan is running and the temperature has dropped
+        # to 10 degrees below the limit.
+        elif fan.value and temp < OFF_THRESHOLD:
+            fan.off()
 
-except:
-    printMsg("ERROR: an unhandled exception occurred")
-    myPin.exitPin()
-    fileLog.close()
+        time.sleep(SLEEP_INTERVAL)
 EOF
 fi
 
@@ -268,7 +192,8 @@ then
 echo -e "\n\e[95mApply Configuration :\e[0m"
 sed -i -e "s/XXXXX/$GPIO_PIN/g" /home/$USER/scripts/run-fan.py
 sed -i -e "s/YYYYY/$Start_TEMP/g" /home/$USER/scripts/run-fan.py
-sed -i -e "s/ZZZZZ/$Gap_TEMP/g" /home/$USER/scripts/run-fan.py
+Threshold=$(expr $Start_TEMP - $Gap_TEMP)
+sed -i -e "s/ZZZZZ/$Threshold/g" /home/$USER/scripts/run-fan.py
 echo -e "Done."
 fi
 

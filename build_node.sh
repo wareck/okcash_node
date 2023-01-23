@@ -314,7 +314,7 @@ else
 Flag=""
 fi
 #make -j$(nproc) -w -f makefile.arm CXXFLAGS="$Flag -fcommon -w" \
-make -w -f makefile.arm CXXFLAGS="$Flag -fcommon " \
+make -w -f makefile.arm CXXFLAGS="$Flag -fcommon -w" \
 OPENSSL_LIB_PATH=$MyDir/openssl-$OpenSSL_v OPENSSL_INCLUDE_PATH=$MyDir/openssl-$OpenSSL_v/include BDB_INCLUDE_PATH=/usr/local/BerkeleyDB.4.8/include/ \
 BDB_LIB_PATH=/usr/local/BerkeleyDB.4.8/lib BOOST_LIB_PATH=/usr/local/lib/ BOOST_INCLUDE_PATH=/usr/local/include/boost/ \
 MINIUPNPC_INCLUDE_PATH=/usr/include/miniupnpc MINIUPNPC_LIB_PATH=/usr/lib/
