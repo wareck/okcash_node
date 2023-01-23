@@ -19,10 +19,14 @@ You can use Raspbian (lite or full, better is to use lite version for efficiency
 ----------
 This script has been extensively tested and still works on my personal node.
 
-Works on Raspberry OS and Dietpi (32bit)
+Works on Raspberry OS and Dietpi 32 bits
 
 ![](https://raw.githubusercontent.com/wareck/okcash_node_raspberry/master/docs/images/software.png)
 
+
+Works on Raspberry OS 64 bits
+
+![](https://raw.githubusercontent.com/wareck/okcash_node_raspberry/master/docs/images/software2.png)
 
 ----------
 

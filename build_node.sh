@@ -30,6 +30,13 @@ if [ $OSV = 9 ];then img_v="Strecth"; fi
 if [ $OSV = 10 ];then img_v="Buster"; fi
 if [ $OSV = 11 ];then img_v="Bullseye"; fi
 fi
+F64=$(uname -m)
+if [ $F64 = aarch64 ]
+then
+F64="YES"
+img_v="Bullseye 64 bits"
+fi
+
 if [ -f /proc/device-tree/model ]
 then
 ident=$(tr -d '\0' < /proc/device-tree/model)
@@ -226,9 +233,15 @@ echo -e "Done."
 
 function Build_Dependencies_ {
 echo -e "\n\e[95mBuild Openssl $OpenSSL_v.:\e[0m"
+if [ $F64 = "YES" ]
+then
+arch="linux-aarch64"
+else
+arch="linux-armv4"
+fi
 cd openssl-$OpenSSL_v
 ./Configure no-zlib no-shared no-dso no-krb5 no-camellia no-capieng no-cast no-dtls1 no-gost no-gmp no-heartbeats no-idea no-jpake \
-no-md2 no-mdc2 no-rc5 no-rdrand no-rfc3779 no-rsax no-sctp no-seed no-sha0 no-static_engine no-whirlpool no-rc2 no-rc4 no-ssl2 no-ssl3 linux-armv4
+no-md2 no-mdc2 no-rc5 no-rdrand no-rfc3779 no-rsax no-sctp no-seed no-sha0 no-static_engine no-whirlpool no-rc2 no-rc4 no-ssl2 no-ssl3 $arch
 make depend
 make -j$(nproc)
 cd ..
@@ -236,12 +249,12 @@ cd ..
 echo -e "\n\e[95mBuild DB-$DB_v:\e[0m"
 if [ -f /usr/share/man/man3/miniupnpc.3.gz ]; then sudo rm /usr/share/man/man3/miniupnpc.3.gz; fi
 cd db-$DB_v
-if ! [ -f db48.patch ]
-then
-wget -c http://wareck.free.fr/crypto/okcash/sources/db48.patch
-#patching db4.8 source for C11 compilation portability
-patch --ignore-whitespace -p1 < db48.patch
-fi
+#if ! [ -f db48.patch ]
+#then
+#wget -c http://wareck.free.fr/crypto/okcash/sources/db48.patch
+##patching db4.8 source for C11 compilation portability
+#patch --ignore-whitespace -p1 < db48.patch
+#fi
 cd build_unix
 ../dist/configure --enable-cxx --disable-shared --with-pic
 make -j$(nproc)
@@ -281,12 +294,14 @@ sleep 1
 fi
 cd okcash
 cd src
+
 if ! [ -f makefile.arm.patch ]
 then
 cp $MyDir/files/makefile.arm.patch .
 echo -e "\e[97mPatching makefile.arm \e[0m"
 patch -p0 <makefile.arm.patch
 fi
+
 cd leveldb
 make -j$(nproc)
 make -j$(nproc) libmemenv.a
@@ -298,7 +313,8 @@ Flag="--param ggc-min-expand=1 --param ggc-min-heapsize=32768"
 else
 Flag=""
 fi
-make -j$(nproc) -w -f makefile.arm CXXFLAGS="$Flag -fcommon -w" \
+#make -j$(nproc) -w -f makefile.arm CXXFLAGS="$Flag -fcommon -w" \
+make -w -f makefile.arm CXXFLAGS="$Flag -fcommon " \
 OPENSSL_LIB_PATH=$MyDir/openssl-$OpenSSL_v OPENSSL_INCLUDE_PATH=$MyDir/openssl-$OpenSSL_v/include BDB_INCLUDE_PATH=/usr/local/BerkeleyDB.4.8/include/ \
 BDB_LIB_PATH=/usr/local/BerkeleyDB.4.8/lib BOOST_LIB_PATH=/usr/local/lib/ BOOST_INCLUDE_PATH=/usr/local/include/boost/ \
 MINIUPNPC_INCLUDE_PATH=/usr/include/miniupnpc MINIUPNPC_LIB_PATH=/usr/lib/
@@ -527,10 +543,17 @@ echo -e "Done."
 
 function Raspberry-optimisation_ {
 echo -e "\n\e[95mRaspberry optimisation \e[97mWatchDog and Autostart:\e[0m"
+if ! [ $F64 = "YES" ]
+then
 sudo apt-get install watchdog chkconfig -y >/dev/null
 sudo chkconfig watchdog on >/dev/null
 sudo /etc/init.d/watchdog start >/dev/null
 sudo update-rc.d watchdog enable >/dev/null
+else
+sudo apt-get install watchdog -y >/dev/null
+sudo /etc/init.d/watchdog start >/dev/null
+sudo update-rc.d watchdog enable >/dev/null
+fi
 
 if ! [ -f /home/$MyUser/scripts/watchdog_okcash.sh ]
 then
