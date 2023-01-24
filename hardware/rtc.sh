@@ -81,7 +81,7 @@ echo -e "\n\e[95mBuild userland pack (missing in Raspbian Bullseye):\e[0m"
 #./buildme
 #cd ..
 #rm -r -f userland
-sudo dpkg -r ../files/userland_1.51-1_armhf.deb
+sudo dpkg -i ../files/userland_1.51-1_armhf.deb
 fi
 echo -e "Done."
 echo -e "\n\e[95mRTC Checks:\e[0m"
