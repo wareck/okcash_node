@@ -33,6 +33,9 @@ Website=YES
 #Website port 80 for standard html port , or other port if needed
 Website_port=80
 
+#website server can be apache or lighttpd
+Website_daemon=apache
+
 #Enable firewall
 Firewall=YES
 
@@ -41,6 +44,9 @@ Ipv6=NO
 
 #Login banner (add logo banner at start)
 Banner=YES
+
+#enable okcash autostart at raspberry boot
+AutoStart=YES
 
 #Reboot after build
 Reboot=YES

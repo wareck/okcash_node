@@ -11,10 +11,9 @@ author=wareck@gmail.com
 #download external config:
 source config.txt
 
-AutoStart=YES
-
-### Main Code ###
-# check size of card:
+function config_check {
+if ! [[ $Website_daemon = "apache"  || $Website_daemon = "lighttpd" ]];then echo "Error configuration Web_daemon" & exit ;fi
+if ! [[ $Bootstrap = "YES" || $Bootstrap = "NO" ]];then echo "Error configuration Bootstrap" & exit ;fi
 SOC=`df | grep /dev/root | awk '{print $4'}`
 if [ -f /boot/dietpi.txt ]
 then
@@ -25,10 +24,22 @@ else
 LSB=$(cat /etc/debian_version)
 OSV=$(sed 's/\..*//' /etc/debian_version)
 DietPi_="NO"
-if [ $OSV = 8 ];then img_v="Jessie";fi
-if [ $OSV = 9 ];then img_v="Strecth"; fi
-if [ $OSV = 10 ];then img_v="Buster"; fi
-if [ $OSV = 11 ];then img_v="Bullseye"; fi
+case $OSV in
+8 | 9 )
+echo -e "Obsolete raspberry image. please use a newer one"
+exit 0
+;;
+10)
+img_v="Buster"
+;;
+11)
+img_v="Bullseye"
+;;
+*)
+echo -e "\e[38;5;166mUnknown system, please use Raspberry Stretch , Jessie, Buster or Bullseye image...\e[0m"
+exit 0
+;;
+esac
 fi
 F64=$(uname -m)
 if [ $F64 = aarch64 ]
@@ -36,7 +47,6 @@ then
 F64="YES"
 img_v="Bullseye 64 bits"
 fi
-
 if [ -f /proc/device-tree/model ]
 then
 ident=$(tr -d '\0' < /proc/device-tree/model)
@@ -44,15 +54,18 @@ else
 ident=""
 img_v="Unknown"
 fi
+}
+
+
+### Main Code ###
+# check size of card:
 MyUser=$USER
 MyDir=$PWD
+Dw=0
 echo $MyUser>/tmp/node_user
-
-Dw=0 #daemon working flag
-
 echo -e "\e[93mOkcash Headless Node builder v$Version ($Release)\e[0m"
 echo -e "Author : wareck@gmail.com"
-sleep 2
+config_check
 echo -e "\n\e[97mConfiguration:\e[0m"
 echo -e "--------------"
 echo -e -n "Download Bootstrap.dat    : "; if [ $Bootstrap = "YES" ];then echo -e "[\e[92m YES \e[0m]"; else echo -e "[\e[91m NO  \e[0m]";fi
@@ -249,12 +262,6 @@ cd ..
 echo -e "\n\e[95mBuild DB-$DB_v:\e[0m"
 if [ -f /usr/share/man/man3/miniupnpc.3.gz ]; then sudo rm /usr/share/man/man3/miniupnpc.3.gz; fi
 cd db-$DB_v
-#if ! [ -f db48.patch ]
-#then
-#wget -c http://wareck.free.fr/crypto/okcash/sources/db48.patch
-##patching db4.8 source for C11 compilation portability
-#patch --ignore-whitespace -p1 < db48.patch
-#fi
 cd build_unix
 ../dist/configure --enable-cxx --disable-shared --with-pic
 make -j$(nproc)
@@ -313,8 +320,7 @@ Flag="--param ggc-min-expand=1 --param ggc-min-heapsize=32768"
 else
 Flag=""
 fi
-#make -j$(nproc) -w -f makefile.arm CXXFLAGS="$Flag -fcommon -w" \
-make -w -f makefile.arm CXXFLAGS="$Flag -fcommon -w" \
+make -j$(nproc) -w -f makefile.arm CXXFLAGS="$Flag -fcommon -w" \
 OPENSSL_LIB_PATH=$MyDir/openssl-$OpenSSL_v OPENSSL_INCLUDE_PATH=$MyDir/openssl-$OpenSSL_v/include BDB_INCLUDE_PATH=/usr/local/BerkeleyDB.4.8/include/ \
 BDB_LIB_PATH=/usr/local/BerkeleyDB.4.8/lib BOOST_LIB_PATH=/usr/local/lib/ BOOST_INCLUDE_PATH=/usr/local/include/boost/ \
 MINIUPNPC_INCLUDE_PATH=/usr/include/miniupnpc MINIUPNPC_LIB_PATH=/usr/lib/
@@ -475,20 +481,18 @@ fi
 
 function install_website_ {
 echo -e "\n\e[95mWebsite Frontend installation:\e[0m"
+if [ $Website_daemon = "apache" ]
+then
+sudo apt-get install apache2 -y >/dev/null
+else
+sudo apt-get install lighttpd -y >/dev/null
+fi
 OSV=$(sed 's/\..*//' /etc/debian_version)
 case $OSV in
-8)
-sudo apt-get install apache2 php5 php5-xmlrpc curl php5-curl -y >/dev/null;;
-9)
-sudo apt-get install apache2 php7.0 php7.0-xmlrpc curl php7.0-curl -y >/dev/null;;
 10)
-sudo apt-get install apache2 php7.3 php7.3-xmlrpc curl php7.3-curl -y >/dev/null;;
+sudo apt-get install php7.3 php7.3-xmlrpc curl php7.3-curl -y >/dev/null;;
 11)
-sudo apt-get install apache2 php7.4 php7.4-xmlrpc php7.4-curl -y >/dev/null;;
-*)
-echo -e "\e[38;5;166mUnknown system, please use Raspberry Stretch , Jessie, Buster or Bullseye image...\e[0m"
-exit 0
-;;
+sudo apt-get install php7.4 php7.4-xmlrpc php7.4-curl -y >/dev/null;;
 esac
 cd /var/www/
 if ! [ -f /var/www/node_status/php/config.php ]
@@ -508,13 +512,15 @@ then
 	sed -i -e "s/DRV/\/dev\/root/g" /tmp/config.php
 	fi
 	sudo bash -c 'sudo mv /tmp/config.php /var/www/node_status/php/config.php'
-        if [ ! -f /etc/apache2/sites-enabled/000-default.conf.old ]
-        then
+
+if [ $Website_daemon = "apache" ]
+then
+if [ ! -f /etc/apache2/sites-enabled/000-default.conf.old ]
+then
         sudo bash -c 'sudo mv /etc/apache2/sites-enabled/000-default.conf /etc/apache2/sites-enabled/000-default.conf.old'
 	fi
 if [ ! -f /etc/apache2/sites-enabled/001-node_status.conf ]
 then
-
 cat <<'EOF'>> /tmp/001-node_status.conf
 <VirtualHost *:80>
         ServerAdmin webmaster@localhost
@@ -523,11 +529,11 @@ cat <<'EOF'>> /tmp/001-node_status.conf
         CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>
 EOF
-
         sed -i -e "s/80/$Website_port/g" /tmp/001-node_status.conf
         sudo cp /tmp/001-node_status.conf /etc/apache2/sites-enabled/001-node_status.conf
         fi
         cd /home/$MyUser
+fi
 fi
 
 if  ! grep "curl -Ssk http://127.0.0.1/stats.php" /etc/crontab >/dev/null
@@ -537,12 +543,16 @@ sudo bash -c 'echo "#Okcash frontend website" > /dev/null >>/etc/crontab | sudo 
 sudo bash -c 'form=$(cat "/tmp/node_user") && echo "*/5 *  *   *   *  $form curl -Ssk http://127.0.0.1/stats.php > /dev/null" >>/etc/crontab | sudo -s'
 sudo bash -c 'form=$(cat "/tmp/node_user") && echo "*/5 *  *   *   *  $form curl -Ssk http://127.0.0.1/peercount.php > /dev/null" >>/etc/crontab | sudo -s'
 fi
+if [ $Website_daemon = "apache" ]
+then
 sudo /etc/init.d/apache2 restart >/dev/null
+fi
 echo -e "Done."
 }
 
 function Raspberry-optimisation_ {
-echo -e "\n\e[95mRaspberry optimisation \e[97mWatchDog and Autostart:\e[0m"
+echo -e "\n\e[95mRaspberry optimisation:"
+echo -e -n "\e[97mWatchDog and Autostart: \e[0m"
 if ! [ $F64 = "YES" ]
 then
 sudo apt-get install watchdog chkconfig -y >/dev/null
@@ -572,7 +582,7 @@ fi
 chmod +x /home/$MyUser/scripts/watchdog_okcash.sh
 echo -e "Done."
 
-echo -e "\n\e[95mRaspberry optimisation \e[97mEnabling/tunning Watchdog:\e[0m"
+echo -e -n "\e[97mEnabling/tunning Watchdog: \e[0m"
 sudo bash -c 'sed -i -e "s/#watchdog-device/watchdog-device/g" /etc/watchdog.conf'
 sudo bash -c 'sed -i -e "s/#interval             = 1/interval            = 4/g" /etc/watchdog.conf'
 sudo bash -c 'sed -i -e "s/#max-load-1              = 24/max-load-1              = 24/g" /etc/watchdog.conf'
@@ -587,7 +597,7 @@ sudo bash -c 'echo "bcm2835_wdt" >>/etc/modules'
 fi
 echo -e "Done."
 
-echo -e "\n\e[95mRaspberry optimisation \e[97mWatchdog.sh & crontab:\e[0m"
+echo -e -n "\e[97mWatchdog.sh & crontab: \e[0m"
 if  ! grep "watchdog_okcash.sh" /etc/crontab >/dev/null
 then
 sudo bash -c 'echo "" >>/etc/crontab | sudo -s'
@@ -598,7 +608,7 @@ echo "Done."
 
 if  [ $DietPi_ = "NO" ]
 then
-echo -e "\n\e[95mRaspberry optimisation \e[97mDisable Blueutooth:\e[0m"
+echo -e -n "\e[97mDisable Blueutooth: \e[0m"
 	if ! grep "dtoverlay=pi3-disable-bt" /boot/config.txt >/dev/null
 	then
 	sudo bash -c 'echo "" >>/boot/config.txt'
@@ -610,21 +620,22 @@ echo -e "\n\e[95mRaspberry optimisation \e[97mDisable Blueutooth:\e[0m"
 echo -e "Done."
 fi
 
-echo -e "\n\e[95mRaspberry optimisation \e[97mDisable Audio:\e[0m"
+echo -e -n "\e[97mDisable Audio: \e[0m"
 if grep "dtparam=audio=on" /boot/config.txt >/dev/null
 	then
 	sudo bash -c 'sed -i -e "s/dtparam=audio=on/dtparam=audio=off/g" /boot/config.txt'
 fi
 echo -e "Done."
 
-echo -e "\n\e[95mRaspberry optimisation \e[97mDisable Console blank:\e[0m"
+echo -e -n "\e[97mDisable Console blank: \e[0m"
 if ! grep "consoleblank=0" /boot/cmdline.txt >/dev/null
 	then
 	sudo bash -c 'sed -i -e "s/rootwait/rootwait consoleblank=0/g" /boot/cmdline.txt'
 fi
+
 echo -e "Done."
 
-echo -e "\n\e[95mRaspberry optimisation \e[97mDisable wifi power saving:\e[0m"
+echo -e -n "\e[97mDisable wifi power saving: \e[0m"
 if ! grep "#Disable wifi power saving" /etc/rc.local >/dev/null
         then
                 sudo bash -c 'sed -i -e "s/exit 0//g" /etc/rc.local'
@@ -636,7 +647,7 @@ echo -e "Done."
 
 if [ $Ipv6 = "NO" ]
 then
-echo -e "\n\e[95mRaspberry optimisation \e[97mDisable ipv6:\e[0m"
+echo -e -n "\e[97mDisable ipv6: \e[0m"
 if ! grep "#Disable ipv6" /etc/sysctl.conf  >/dev/null
 then
 cp /etc/sysctl.conf /tmp
@@ -667,7 +678,7 @@ fi
 }
 
 function auto_start_ {
-echo -e "\n\e[95mOkcash autostart \e[0m"
+echo -e "\n\e[95mOkcash autostart: \e[0m"
 if ! [ -f /etc/rc.local ]
 then
 cat <<'EOF'>>/tmp/rc.local
@@ -783,6 +794,14 @@ echo -e ""
 sudo ufw status verbose || true
 sudo ufw --force enable || true
 echo -e "Done."
+}
+
+function config_check {
+if ! [[ $Website_daemon = "apache"  || $Website_daemon = "lighttpd" ]]
+then
+echo "error configuration"
+exit
+fi
 }
 
 ############
