@@ -484,15 +484,22 @@ echo -e "\n\e[95mWebsite Frontend installation:\e[0m"
 if [ $Website_daemon = "apache" ]
 then
 sudo apt-get install apache2 -y >/dev/null
-else
-sudo apt-get install lighttpd -y >/dev/null
-fi
 OSV=$(sed 's/\..*//' /etc/debian_version)
 case $OSV in
 10)
 sudo apt-get install php7.3 php7.3-xmlrpc curl php7.3-curl -y >/dev/null;;
 11)
 sudo apt-get install php7.4 php7.4-xmlrpc php7.4-curl -y >/dev/null;;
+esac
+else
+sudo apt-get install lighttpd -y >/dev/null
+fi
+OSV=$(sed 's/\..*//' /etc/debian_version)
+case $OSV in
+10)
+sudo apt-get install php7.3-fpm php7.3-mbstring php7.3-mysql php7.3-curl php7.3-gd php7.3-curl php7.3-zip php7.3-xml -y >/dev/null;;
+11)
+sudo apt-get install php7.4-fpm php7.4-mbstring php7.4-mysql php7.4-curl php7.4-gd php7.4-curl php7.4-zip php7.4-xml -y >/dev/null;;
 esac
 cd /var/www/
 if ! [ -f /var/www/node_status/php/config.php ]
@@ -535,6 +542,34 @@ EOF
         cd /home/$MyUser
 fi
 fi
+if [ $Website_daemon = "lighttpd" ]
+then
+if ! [ -f /etc/lighttpd/lighttpd.conf.old ]
+then
+sudo cp /etc/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd.conf.old
+fi
+cp /etc/lighttpd/lighttpd.conf /home/pi/
+sed -i -e "s/html/node_status/g" /home/pi/lighttpd.conf
+sed -i -e "s/server.port                 = 80/server.port                 = /g" /home/pi/lighttpd.conf
+sed -i -e "s/server.port                 = /server.port                 = $Website_port/g" /home/pi/lighttpd.conf
+sudo cp /home/pi/lighttpd.conf /etc/lighttpd/lighttpd.conf
+cat <<'EOF'>> /tmp/15-fastcgi-php.conf
+# -*- depends: fastcgi -*-
+# /usr/share/doc/lighttpd/fastcgi.txt.gz
+# http://redmine.lighttpd.net/projects/lighttpd/wiki/Docs:ConfigurationOptions#mod_fastcgi-fastcgi
+
+## Start an FastCGI server for php (needs the php5-cgi package)
+fastcgi.server += ( ".php" =>
+        ((
+                "socket" => "/var/run/php/php7.4-fpm.sock",
+                "broken-scriptfilename" => "enable"
+        ))
+)
+EOF
+sudo cp /tmp/15-fastcgi-php.conf /etc/lighttpd/conf-available/15-fastcgi-php.conf
+sudo rm /tmp/15-fastcgi-php.conf 
+sudo lighttpd-enable-mod fastcgi fastcgi-php rewrite | true
+fi
 
 if  ! grep "curl -Ssk http://127.0.0.1/stats.php" /etc/crontab >/dev/null
 then
@@ -546,6 +581,8 @@ fi
 if [ $Website_daemon = "apache" ]
 then
 sudo /etc/init.d/apache2 restart >/dev/null
+else
+sudo /etc/init.d/lighttpd restart >/dev/null
 fi
 echo -e "Done."
 }
@@ -753,10 +790,13 @@ fi
 
 function Firewall_ {
 echo -e "\n\e[95mFirewall setup :\e[0m"
-sudo apt-get -y install ufw libapache2-mod-security2
+sudo apt-get -y install ufw
 if [ $Website = "YES" ]
 then
+if [ $Website_daemon = "apache" ]
+then
 echo "Hidding Apache Server Name"
+sudo apt-get -y install libapache2-mod-security2
 sudo sed -i -e "s/ServerTokens OS//g" /etc/apache2/conf-enabled/security.conf
 sudo sed -i -e "s/ServerTokens Full//g" /etc/apache2/conf-enabled/security.conf
 if ! grep "ServerTokens Full" /etc/apache2/conf-enabled/security.conf >/dev/null
@@ -766,6 +806,7 @@ fi
 if ! grep "SecServerSignature Karma/2.0.1" /etc/apache2/conf-enabled/security.conf >/dev/null
 then
 sudo bash -c 'echo "SecServerSignature Karma/2.0.1" >>/etc/apache2/conf-enabled/security.conf'
+fi
 fi
 fi
 if [ -f /tmp/ufw ]; then sudo rm /tmp/ufw ;fi
@@ -794,14 +835,6 @@ echo -e ""
 sudo ufw status verbose || true
 sudo ufw --force enable || true
 echo -e "Done."
-}
-
-function config_check {
-if ! [[ $Website_daemon = "apache"  || $Website_daemon = "lighttpd" ]]
-then
-echo "error configuration"
-exit
-fi
 }
 
 ############
