@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
-Version=6.4
-Release=22/01/2023
+Version=6.5
+Release=29/01/2023
 author=wareck@gmail.com
 
 #Okcash headless RPI Working (sync enable, staking enable)
@@ -12,7 +12,7 @@ author=wareck@gmail.com
 source config.txt
 
 function config_check {
-if ! [[ $Website_daemon = "apache"  || $Website_daemon = "lighttpd" ]];then echo "Error configuration Web_daemon" & exit ;fi
+if ! [[ $Website_daemon = "apache"  || $Website_daemon = "lighttpd" || $Website_daemon = "nginx" ]];then echo "Error configuration Web_daemon" & exit ;fi
 if ! [[ $Bootstrap = "YES" || $Bootstrap = "NO" ]];then echo "Error configuration Bootstrap" & exit ;fi
 SOC=`df | grep /dev/root | awk '{print $4'}`
 if [ -f /boot/dietpi.txt ]
@@ -56,7 +56,6 @@ img_v="Unknown"
 fi
 }
 
-
 ### Main Code ###
 # check size of card:
 MyUser=$USER
@@ -78,6 +77,8 @@ echo -e -n "Reboot when finish build  : "; if [ $Reboot = "YES" ];then echo -e "
 if [ $Website = "YES" ] && [ ! $Website_port = "80" ]
 then
 echo -e -n "Html port number $Website_port     : \e[38;5;0166mHidden \e[0m"
+else
+echo -e -n "Website engine            :  $Website_daemon"
 fi
 sleep 1
 
@@ -91,7 +92,7 @@ else
 OKcash_v=6.9.0.7-aether
 Comment="(Release)"
 fi
-echo -e "\n\e[97mSoftware Release:\e[0m"
+echo -e "\n\n\e[97mSoftware Release:\e[0m"
 echo -e "-----------------"
 echo $ident
 echo -e "Raspbian Image            : v$LSB ($img_v)"
@@ -491,16 +492,32 @@ sudo apt-get install php7.3 php7.3-xmlrpc curl php7.3-curl -y >/dev/null;;
 11)
 sudo apt-get install php7.4 php7.4-xmlrpc php7.4-curl -y >/dev/null;;
 esac
-else
-sudo apt-get install lighttpd -y >/dev/null
 fi
+
+if [ $Website_daemon = "lighttpd" ]
+then
+sudo apt-get install lighttpd -y >/dev/null
 OSV=$(sed 's/\..*//' /etc/debian_version)
 case $OSV in
 10)
-sudo apt-get install php7.3-fpm php7.3-mbstring php7.3-mysql php7.3-curl php7.3-gd php7.3-curl php7.3-zip php7.3-xml -y >/dev/null;;
+sudo apt-get install php7.3-fpm php7.3-curl php7.3-zip php7.3-xml -y >/dev/null;;
 11)
-sudo apt-get install php7.4-fpm php7.4-mbstring php7.4-mysql php7.4-curl php7.4-gd php7.4-curl php7.4-zip php7.4-xml -y >/dev/null;;
+sudo apt-get install php7.4-fpm php7.4-curl php7.4-zip php7.4-xml -y >/dev/null;;
 esac
+fi
+
+if [ $Website_daemon = "nginx" ]
+then
+sudo apt-get install nginx -y
+OSV=$(sed 's/\..*//' /etc/debian_version)
+case $OSV in
+10)
+sudo apt-get install php7.3-fpm php7.3-curl -y >/dev/null;;
+11)
+sudo apt-get install php7.4-fpm php7.4-curl -y >/dev/null;;
+esac
+fi
+
 cd /var/www/
 if ! [ -f /var/www/node_status/php/config.php ]
 then
@@ -519,15 +536,16 @@ then
 	sed -i -e "s/DRV/\/dev\/root/g" /tmp/config.php
 	fi
 	sudo bash -c 'sudo mv /tmp/config.php /var/www/node_status/php/config.php'
+fi
 
 if [ $Website_daemon = "apache" ]
 then
-if [ ! -f /etc/apache2/sites-enabled/000-default.conf.old ]
-then
+	if [ ! -f /etc/apache2/sites-enabled/000-default.conf.old ]
+	then
         sudo bash -c 'sudo mv /etc/apache2/sites-enabled/000-default.conf /etc/apache2/sites-enabled/000-default.conf.old'
 	fi
-if [ ! -f /etc/apache2/sites-enabled/001-node_status.conf ]
-then
+	if [ ! -f /etc/apache2/sites-enabled/001-node_status.conf ]
+	then
 cat <<'EOF'>> /tmp/001-node_status.conf
 <VirtualHost *:80>
         ServerAdmin webmaster@localhost
@@ -538,16 +556,16 @@ cat <<'EOF'>> /tmp/001-node_status.conf
 EOF
         sed -i -e "s/80/$Website_port/g" /tmp/001-node_status.conf
         sudo cp /tmp/001-node_status.conf /etc/apache2/sites-enabled/001-node_status.conf
-        fi
+	fi
         cd /home/$MyUser
 fi
-fi
+
 if [ $Website_daemon = "lighttpd" ]
 then
-if ! [ -f /etc/lighttpd/lighttpd.conf.old ]
-then
-sudo cp /etc/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd.conf.old
-fi
+	if ! [ -f /etc/lighttpd/lighttpd.conf.old ]
+	then
+	sudo cp /etc/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd.conf.old
+	fi
 cp /etc/lighttpd/lighttpd.conf /home/pi/
 sed -i -e "s/html/node_status/g" /home/pi/lighttpd.conf
 sed -i -e "s/server.port                 = 80/server.port                 = /g" /home/pi/lighttpd.conf
@@ -567,9 +585,45 @@ fastcgi.server += ( ".php" =>
 )
 EOF
 sudo cp /tmp/15-fastcgi-php.conf /etc/lighttpd/conf-available/15-fastcgi-php.conf
-sudo rm /tmp/15-fastcgi-php.conf 
+sudo rm /tmp/15-fastcgi-php.conf
 sudo lighttpd-enable-mod fastcgi fastcgi-php rewrite | true
 fi
+
+if [ $Website_daemon = "nginx" ]
+then
+sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/default.bak
+cat <<'EOF'>> /tmp/ng_default
+server {
+  listen 80 default_server;
+  root /var/www/node_status;
+  index index.php index.html index.htm index.nginx-debian.html;
+  server_name _;
+
+  location / {
+    try_files $uri $uri/ =404;
+  }
+
+  location ~ \.php$ {
+    include snippets/fastcgi-php.conf;
+    fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
+  }
+  location ~ /\.ht {
+    deny all;
+  }
+}
+EOF
+if [ $OSV = "10" ];then sed -i -e "s/php7.4-fpm.sock/php7.3-fpm.sock/g" /tmp/ng_default;fi
+sed -i -e "s/listen 80/listen $Website_port/g" /tmp/ng_default
+sudo cp /tmp/ng_default /etc/nginx/sites-available/default
+sudo rm /tmp/ng_default
+if [ $OSV = "10" ];then sudo cp /etc/php/7.3/fpm/php.ini . ;fi
+if [ $OSV = "11" ];then sudo cp /etc/php/7.4/fpm/php.ini . ;fi
+sudo sed -i -e "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g" php.ini
+if [ $OSV = "10" ];then sudo cp php.ini /etc/php/7.3/fpm/php.ini ;fi
+if [ $OSV = "11" ];then sudo cp php.ini /etc/php/7.4/fpm/php.ini ;fi
+sudo rm php.ini
+fi
+
 
 if  ! grep "curl -Ssk http://127.0.0.1/stats.php" /etc/crontab >/dev/null
 then
@@ -578,12 +632,9 @@ sudo bash -c 'echo "#Okcash frontend website" > /dev/null >>/etc/crontab | sudo 
 sudo bash -c 'form=$(cat "/tmp/node_user") && echo "*/5 *  *   *   *  $form curl -Ssk http://127.0.0.1/stats.php > /dev/null" >>/etc/crontab | sudo -s'
 sudo bash -c 'form=$(cat "/tmp/node_user") && echo "*/5 *  *   *   *  $form curl -Ssk http://127.0.0.1/peercount.php > /dev/null" >>/etc/crontab | sudo -s'
 fi
-if [ $Website_daemon = "apache" ]
-then
-sudo /etc/init.d/apache2 restart >/dev/null
-else
-sudo /etc/init.d/lighttpd restart >/dev/null
-fi
+if [ $Website_daemon = "apache" ];then sudo /etc/init.d/apache2 restart >/dev/null;fi
+if [ $Website_daemon = "lighttpd" ];then sudo /etc/init.d/lighttpd restart >/dev/null;fi
+if [ $Website_daemon = "nginx" ];then sudo /etc/init.d/nginx restart >/dev/null;fi
 echo -e "Done."
 }
 
@@ -776,7 +827,6 @@ cat <<EOF>> /tmp/motd
 |   | |___ _| |___
 | | | | . | . | -_|
 |_|___|___|___|___|
-
  Okcash node v$Version
  $ident
 

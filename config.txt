@@ -33,8 +33,8 @@ Website=YES
 #Website port 80 for standard html port , or other port if needed
 Website_port=80
 
-#website server can be apache or lighttpd
-Website_daemon=apache
+#website server can be apache,lighttpd or nginx
+Website_daemon=nginx
 
 #Enable firewall
 Firewall=YES
