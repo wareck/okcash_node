@@ -168,18 +168,18 @@ if ! [ -x "$(command -v pwgen)" ];then echo -e "[\e[91m NO  \e[0m]" && pwgen_i="
 if ! [ -x "$(command -v xxd)" ]; then xxd_i="xxd" && update_me=1;fi
 if ! [ -x "$(command -v htop)" ];then htop_i="htop" && update_me=1;fi
 if ! [[ -f .pass  || -x "$(command -v dphys-swapfile)" ]];then swap_i="dphys-swapfile" && update_me=1 ;fi
-if [ $Bootstrap = "YES" ]
-then
 echo -e -n "Check MegaDownload        : "
 if ! [ -x "$(command -v megadown)" ]
-then echo -e "[\e[91m NO  \e[0m]"
+then
+echo -e "[\e[91m NO  \e[0m]"
 curl -LJO --silent https://github.com/wareck/megadown/releases/download/v1.0/megadown.tar.bz2
 tar xfj megadown.tar.bz2
 sudo mv megadown /usr/local/bin
 rm megadown.tar.bz2
 else
-echo -e "[\e[92m YES \e[0m]";fi
+echo -e "[\e[92m YES \e[0m]"
 fi
+
 sleep 1
 if [ $update_me = 1 ]
 then
@@ -488,9 +488,9 @@ sudo apt-get install apache2 -y >/dev/null
 OSV=$(sed 's/\..*//' /etc/debian_version)
 case $OSV in
 10)
-sudo apt-get install php7.3 php7.3-xmlrpc curl php7.3-curl -y >/dev/null;;
+sudo apt-get install php7.3-fpm php7.3-mbstring php7.3-mysql php7.3-curl php7.3-gd php7.3-curl php7.3-zip php7.3-xml -y >/dev/null;;
 11)
-sudo apt-get install php7.4 php7.4-xmlrpc php7.4-curl -y >/dev/null;;
+sudo apt-get install php7.4-fpm php7.4-mbstring php7.4-mysql php7.4-curl php7.4-gd php7.4-curl php7.4-zip php7.4-xml -y >/dev/null;;
 esac
 fi
 
@@ -512,9 +512,9 @@ sudo apt-get install nginx -y
 OSV=$(sed 's/\..*//' /etc/debian_version)
 case $OSV in
 10)
-sudo apt-get install php7.3-fpm php7.3-curl -y >/dev/null;;
+sudo apt-get install php7.3-fpm php7.3-curl php7.3-zip -y >/dev/null;;
 11)
-sudo apt-get install php7.4-fpm php7.4-curl -y >/dev/null;;
+sudo apt-get install php7.4-fpm php7.4-curl php7.4-zip -y >/dev/null;;
 esac
 fi
 
@@ -828,7 +828,6 @@ cat <<EOF>> /tmp/motd
 | | | | . | . | -_|
 |_|___|___|___|___|
  Okcash node v$Version
- $ident
 
 EOF
 sudo bash -c 'mv /tmp/motd /etc/motd | sudo -s'
@@ -880,6 +879,12 @@ if [ $Website = "YES" ]
 then
 echo -e "\e[33mOpening up Port $Website_port for website frontpage:\e[0m"
 sudo ufw allow $Website_port/tcp || true
+
+if [ $$Website_daemon = "nginx" ]
+then
+sudo ufw allow 'Nginx Full'
+fi
+
 fi
 echo -e ""
 sudo ufw status verbose || true
