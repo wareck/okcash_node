@@ -315,7 +315,7 @@ make -j$(nproc)
 make -j$(nproc) libmemenv.a
 cd ..
 Totalmem=$(awk '{ printf "%.1f", $2/1024/1024 ; exit}' /proc/meminfo | cut -d. -f1 )
-if [ $Totalmem -gt 3 ] # low memory Raspberry reduce GCC speed and memory use, else normal compilation
+if [ $Totalmem -gt 2 ] # low memory Raspberry reduce GCC speed and memory use, else normal compilation
 then
 Flag="--param ggc-min-expand=1 --param ggc-min-heapsize=32768"
 else
@@ -325,7 +325,7 @@ if [ $F64 = "YES" ];then a=1;else a="$(nproc)";fi
 make -j$a -w -f makefile.arm CXXFLAGS="$Flag -fcommon -w" \
 OPENSSL_LIB_PATH=$MyDir/openssl-$OpenSSL_v OPENSSL_INCLUDE_PATH=$MyDir/openssl-$OpenSSL_v/include BDB_INCLUDE_PATH=/usr/local/BerkeleyDB.4.8/include/ \
 BDB_LIB_PATH=/usr/local/BerkeleyDB.4.8/lib BOOST_LIB_PATH=/usr/local/lib/ BOOST_INCLUDE_PATH=/usr/local/include/boost/ \
-MINIUPNPC_INCLUDE_PATH=/usr/include/miniupnpc MINIUPNPC_LIB_PATH=/usr/lib/
+MINIUPNPC_INCLUDE_PATH=/usr/include/miniupnpc MINIUPNPC_LIB_PATH=/usr/lib/ -k
 sudo cp okcashd /usr/local/bin ||true
 sudo strip /usr/local/bin/okcashd ||true
 }

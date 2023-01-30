@@ -70,7 +70,7 @@ select opt in "${options[@]}"
 do
     case $opt in
         "Check again")
-            check
+            check_
             break
             ;;
         "Continue")
