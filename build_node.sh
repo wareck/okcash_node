@@ -321,7 +321,8 @@ Flag="--param ggc-min-expand=1 --param ggc-min-heapsize=32768"
 else
 Flag=""
 fi
-make -j$(nproc) -w -f makefile.arm CXXFLAGS="$Flag -fcommon -w" \
+if [ $F64 = "YES" ];then a=1;else a="$(nproc)";fi
+make -j$a -w -f makefile.arm CXXFLAGS="$Flag -fcommon -w" \
 OPENSSL_LIB_PATH=$MyDir/openssl-$OpenSSL_v OPENSSL_INCLUDE_PATH=$MyDir/openssl-$OpenSSL_v/include BDB_INCLUDE_PATH=/usr/local/BerkeleyDB.4.8/include/ \
 BDB_LIB_PATH=/usr/local/BerkeleyDB.4.8/lib BOOST_LIB_PATH=/usr/local/lib/ BOOST_INCLUDE_PATH=/usr/local/include/boost/ \
 MINIUPNPC_INCLUDE_PATH=/usr/include/miniupnpc MINIUPNPC_LIB_PATH=/usr/lib/
@@ -595,6 +596,7 @@ sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/default.ba
 cat <<'EOF'>> /tmp/ng_default
 server {
   listen 80 default_server;
+  listen [::]:80 default_server;
   root /var/www/node_status;
   index index.php index.html index.htm index.nginx-debian.html;
   server_name _;
@@ -827,6 +829,7 @@ cat <<EOF>> /tmp/motd
 |   | |___ _| |___
 | | | | . | . | -_|
 |_|___|___|___|___|
+
  Okcash node v$Version
 
 EOF
