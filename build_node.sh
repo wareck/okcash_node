@@ -41,8 +41,8 @@ exit 0
 ;;
 esac
 fi
-F64=$(uname -m)
-if [ $F64 = aarch64 ]
+F64=$(getconf LONG_BIT)
+if [ $F64 = 64 ]
 then
 F64="YES"
 img_v="Bullseye 64 bits"
@@ -534,7 +534,7 @@ then
 	then
 	sed -i -e "s/DRV/\/home\/$MyUser\/.okcash/g" /tmp/config.php
 	else
-	sed -i -e "s/DRV/\/dev\/root/g" /tmp/config.php
+	sed -i -e "s/DRV/\//g" /tmp/config.php
 	fi
 	sudo bash -c 'sudo mv /tmp/config.php /var/www/node_status/php/config.php'
 fi
