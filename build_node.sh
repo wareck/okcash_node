@@ -342,7 +342,7 @@ daemon=1
 listen=1
 staking=1
 enableaccounts=1
-maxconnections=10
+maxconnections=15
 
 #Connection User and Password
 rpcuser=user
@@ -357,36 +357,27 @@ port=dudp_port
 #datadir=/home/USER/.okcash
 
 #Add extra Nodes
-addnode=103.81.194.78
 addnode=104.229.10.238
-addnode=108.61.197.20
-addnode=121.200.29.57
-addnode=13.209.243.246
+addnode=108.160.119.104
+addnode=108.5.241.97
 addnode=13.209.60.161
-addnode=136.143.149.184
-addnode=137.186.12.70
-addnode=146.212.70.130
-addnode=154.16.192.76
-addnode=172.93.132.172
-addnode=185.159.157.44
-addnode=185.224.134.45
-addnode=189.174.136.225
-addnode=189.40.108.199
-addnode=200.217.138.157
-addnode=212.102.54.166
-addnode=213.232.87.62
-addnode=23.227.150.229
-addnode=23.97.222.172
-addnode=34.126.107.138
-addnode=34.80.252.109
-addnode=34.81.157.246
-addnode=45.82.164.199
-addnode=67.218.240.215
-addnode=84.247.48.166
-addnode=86.45.85.176
-addnode=91.139.203.62
-addnode=97.123.83.144
-addnode=98.250.175.53
+addnode=139.47.17.53
+addnode=142.132.199.25
+addnode=146.70.112.108
+addnode=146.70.112.188
+addnode=148.59.149.52
+addnode=154.56.136.18
+addnode=159.196.219.68
+addnode=162.252.240.130
+addnode=171.33.234.206
+addnode=171.33.234.222
+addnode=177.149.118.79
+addnode=178.249.211.136
+addnode=82.65.226.217
+addnode=86.106.2.111
+addnode=86.106.2.162
+addnode=91.246.66.175
+addnode=91.51.100.183
 EOF
 rpcu=$(pwgen -ncsB 18 1) #gen random user
 rpcp=$(pwgen -ncsB 18 1) #gen random password
@@ -725,15 +716,15 @@ fi
 
 echo -e "Done."
 
-echo -e -n "\e[97mDisable wifi power saving: \e[0m"
-if ! grep "#Disable wifi power saving" /etc/rc.local >/dev/null
-        then
-                sudo bash -c 'sed -i -e "s/exit 0//g" /etc/rc.local'
-                sudo bash -c 'echo "#Disable wifi power saving" >>/etc/rc.local'
-                sudo bash -c 'echo "/sbin/iwconfig wlan0 power off" >>/etc/rc.local'
-                sudo bash -c 'echo "exit 0" >>/etc/rc.local'
-fi
-echo -e "Done."
+#echo -e -n "\e[97mDisable wifi power saving: \e[0m"
+#if ! grep "#Disable wifi power saving" /etc/rc.local >/dev/null
+#        then
+#                sudo bash -c 'sed -i -e "s/exit 0//g" /etc/rc.local'
+#                sudo bash -c 'echo "#Disable wifi power saving" >>/etc/rc.local'
+#                sudo bash -c 'echo "/sbin/iwconfig wlan0 power off" >>/etc/rc.local'
+#                sudo bash -c 'echo "exit 0" >>/etc/rc.local'
+#fi
+#echo -e "Done."
 
 if [ $Ipv6 = "NO" ]
 then
