@@ -480,9 +480,9 @@ sudo apt-get install apache2 -y >/dev/null
 OSV=$(sed 's/\..*//' /etc/debian_version)
 case $OSV in
 10)
-sudo apt-get install php7.3-fpm php7.3-mbstring php7.3-mysql php7.3-curl php7.3-gd php7.3-curl php7.3-zip php7.3-xml -y >/dev/null;;
+sudo apt-get install php7.3-fpm php7.3-mbstring php7.3-mysql php7.3-gd php7.3-curl php7.3-zip php7.3-xml libapache2-mod-php7.3 -y >/dev/null;;
 11)
-sudo apt-get install php7.4-fpm php7.4-mbstring php7.4-mysql php7.4-curl php7.4-gd php7.4-curl php7.4-zip php7.4-xml -y >/dev/null;;
+sudo apt-get install php7.4-fpm php7.4-mbstring php7.4-mysql php7.4-gd php7.4-curl php7.4-zip php7.4-xml libapache2-mod-php7.4 -y >/dev/null;;
 esac
 fi
 
