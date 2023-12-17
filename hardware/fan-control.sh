@@ -6,7 +6,7 @@ Version=`cat ../build_node.sh | grep -Po "(?<=Version=)([0-9]|\.)*(?=\s|$)"`
 ###############
 Yahboom="NO"  #YES if you use Yahboom RGB/OLED/FAN Hat bought on Amazon
 
-GPIO_PIN=4    #physical GPIO Pin number to turn fan on and off
+GPIO_PIN=18    #physical GPIO Pin number to turn fan on and off
 Start_TEMP=53 #Start temperature in Celsius
 Gap_TEMP=5    #Wait until the temperature is X degrees under the Max before shutting off
 PWM=0

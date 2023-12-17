@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
-Version=6.5
-Release=29/01/2023
+Version=6.6.0
+Release=12/12/2023
 author=wareck@gmail.com
 
 #Okcash headless RPI Working (sync enable, staking enable)
@@ -12,7 +12,18 @@ author=wareck@gmail.com
 source config.txt
 
 function config_check {
-if ! [[ $Website_daemon = "apache"  || $Website_daemon = "lighttpd" || $Website_daemon = "nginx" ]];then echo "Error configuration Web_daemon" & exit ;fi
+Okcash_DEV=${Okcash_DEV^^}
+Bootstrap=${Bootstrap^^}
+Raspi_optimize=${Raspi_optimize^^}
+Website=${Website^^}
+Website_daemon=${Website_daemon^^}
+Firewall=${Firewall^^}
+Ipv6=${Ipv6^^}
+Banner=${Banner^^}
+AutoStart=${AutoStart^^}
+Reboot=${Reboot^^}
+
+if ! [[ $Website_daemon = "APACHE"  || $Website_daemon = "LIGHTTPD" || $Website_daemon = "NGINX" ]];then echo "Error configuration Web_daemon" & exit ;fi
 if ! [[ $Bootstrap = "YES" || $Bootstrap = "NO" ]];then echo "Error configuration Bootstrap" & exit ;fi
 SOC=`df | grep /dev/root | awk '{print $4'}`
 if [ -f /boot/dietpi.txt ]
@@ -474,7 +485,7 @@ fi
 
 function install_website_ {
 echo -e "\n\e[95mWebsite Frontend installation:\e[0m"
-if [ $Website_daemon = "apache" ]
+if [ $Website_daemon = "APACHE" ]
 then
 sudo apt-get install apache2 -y >/dev/null
 OSV=$(sed 's/\..*//' /etc/debian_version)
@@ -486,7 +497,7 @@ sudo apt-get install php7.4-fpm php7.4-mbstring php7.4-mysql php7.4-gd php7.4-cu
 esac
 fi
 
-if [ $Website_daemon = "lighttpd" ]
+if [ $Website_daemon = "LIGHTTPD" ]
 then
 sudo apt-get install lighttpd -y >/dev/null
 OSV=$(sed 's/\..*//' /etc/debian_version)
@@ -498,7 +509,7 @@ sudo apt-get install php7.4-fpm php7.4-curl php7.4-zip php7.4-xml -y >/dev/null;
 esac
 fi
 
-if [ $Website_daemon = "nginx" ]
+if [ $Website_daemon = "NGINX" ]
 then
 sudo apt-get install nginx -y
 OSV=$(sed 's/\..*//' /etc/debian_version)
@@ -509,8 +520,8 @@ sudo apt-get install php7.3-fpm php7.3-curl php7.3-zip -y >/dev/null;;
 sudo apt-get install php7.4-fpm php7.4-curl php7.4-zip -y >/dev/null;;
 esac
 fi
-
 cd /var/www/
+
 if ! [ -f /var/www/node_status/php/config.php ]
 then
         sudo bash -c 'git clone https://github.com/wareck/okcash-node-frontend.git node_status'
@@ -530,7 +541,7 @@ then
 	sudo bash -c 'sudo mv /tmp/config.php /var/www/node_status/php/config.php'
 fi
 
-if [ $Website_daemon = "apache" ]
+if [ $Website_daemon = "APACHE" ]
 then
 	if [ ! -f /etc/apache2/sites-enabled/000-default.conf.old ]
 	then
@@ -552,7 +563,7 @@ EOF
         cd /home/$MyUser
 fi
 
-if [ $Website_daemon = "lighttpd" ]
+if [ $Website_daemon = "LIGHTTPD" ]
 then
 	if ! [ -f /etc/lighttpd/lighttpd.conf.old ]
 	then
@@ -581,7 +592,7 @@ sudo rm /tmp/15-fastcgi-php.conf
 sudo lighttpd-enable-mod fastcgi fastcgi-php rewrite | true
 fi
 
-if [ $Website_daemon = "nginx" ]
+if [ $Website_daemon = "NGINX" ]
 then
 sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/default.bak
 cat <<'EOF'>> /tmp/ng_default
@@ -625,9 +636,9 @@ sudo bash -c 'echo "#Okcash frontend website" > /dev/null >>/etc/crontab | sudo 
 sudo bash -c 'form=$(cat "/tmp/node_user") && echo "*/5 *  *   *   *  $form curl -Ssk http://127.0.0.1/stats.php > /dev/null" >>/etc/crontab | sudo -s'
 sudo bash -c 'form=$(cat "/tmp/node_user") && echo "*/5 *  *   *   *  $form curl -Ssk http://127.0.0.1/peercount.php > /dev/null" >>/etc/crontab | sudo -s'
 fi
-if [ $Website_daemon = "apache" ];then sudo /etc/init.d/apache2 restart >/dev/null;fi
-if [ $Website_daemon = "lighttpd" ];then sudo /etc/init.d/lighttpd restart >/dev/null;fi
-if [ $Website_daemon = "nginx" ];then sudo /etc/init.d/nginx restart >/dev/null;fi
+if [ $Website_daemon = "APACHE" ];then sudo /etc/init.d/apache2 restart >/dev/null;fi
+if [ $Website_daemon = "LIGHTTPD" ];then sudo /etc/init.d/lighttpd restart >/dev/null;fi
+if [ $Website_daemon = "NGINX" ];then sudo /etc/init.d/nginx restart >/dev/null;fi
 echo -e "Done."
 }
 
@@ -836,7 +847,7 @@ echo -e "\n\e[95mFirewall setup :\e[0m"
 sudo apt-get -y install ufw
 if [ $Website = "YES" ]
 then
-if [ $Website_daemon = "apache" ]
+if [ $Website_daemon = "APACHE" ]
 then
 echo "Hidding Apache Server Name"
 sudo apt-get -y install libapache2-mod-security2
@@ -874,7 +885,7 @@ then
 echo -e "\e[33mOpening up Port $Website_port for website frontpage:\e[0m"
 sudo ufw allow $Website_port/tcp || true
 
-if [ $$Website_daemon = "nginx" ]
+if [ $$Website_daemon = "NGINX" ]
 then
 sudo ufw allow 'Nginx Full'
 fi
