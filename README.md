@@ -14,7 +14,7 @@ You can use Raspbian (lite or full, better is to use lite version for efficiency
 
 **Note:**
 
-***Due to the recent database increase, okcash need more power and more memory to works. At the first start, to stakes coin, okcash need enough memory to open database, check blockchain and works on files. Thats why, since april 2020, this node do not work anymore on old Raspberry Pi. I suggest to use a Raspberry Pi3 or higher with a fast sdcard, a SSD drive or a fast USB key. Actually, this software work at home on a raspberry pi4 and a kingston high speed usb key with a 8gb sdcard.***
+***Due to the recent database increase, okcash need more power and more memory to works. At the first start, to stakes coin, okcash need enough memory to open database, check blockchain and works on files. Thats why, since april 2020, this node do not work anymore on old Raspberry Pi. I suggest to use a Raspberry Pi4 or higher with a fast sdcard, a SSD drive or a fast USB key. Actually, this software work at home on a raspberry pi4 and a kingston high speed usb key with a 8gb sdcard.***
 
 ----------
 This script has been extensively tested and still works on my personal node.
@@ -32,13 +32,13 @@ Works on Raspberry OS 64 bits
 
 **Actual softwares/libraries versions :**
 
-**Okcash** : v7.0.0.0 (Github last official release)
+**Okcash** : v8.0.2.0 (Github files)
 
-**OpenSSL** :v1.0.2n
+**OpenSSL** :v3.0.2
 
-**LibBoost** :v1.67.0
+**LibBoost** :v1.74.0
 
-**libDB** : v4.8.30
+**libDB** : v4.8.30.NC
 
 **Miniupnpc** : v2.2.3 
 

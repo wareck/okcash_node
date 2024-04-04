@@ -3,11 +3,11 @@ Version=`cat ../build_node.sh | grep -Po "(?<=Version=)([0-9]|\.)*(?=\s|$)"`
 
 Yahboom="NO"   #YES if you wants to use Yahboom RGB hat bought on Amazon
 
-GPIO_PIN=11    #GPIO Pin number to turn led on and off
+GPIO_PIN=16    #GPIO Pin number to turn led on and off
 INVERT="NO"    #If YES => led ON when okcash crashed, NO => led ON when okcash running
 
 echo -e "\e[93mOkcash Headless Node Led-Status v$Version :\e[0m"
-echo -e "wareck@gmail.com"
+echo -e "wareck@free.fr"
 echo -e ""
 echo -e "This script will install led-status addon script and service."
 echo -e "Read documentation for installing hardware."
@@ -23,7 +23,7 @@ fi
 
 if ! [ -x /opt/vc/bin/vcgencmd ]
 then
-echo -e "\n\e[95mBuild userland pack (missing in Raspbian Bullseye):\e[0m"
+echo -e "\n\e[95mBuild Userland Pack :\e[0m"
 #build from source:
 #sudo apt-get install cmake git -y
 #echo -e ""

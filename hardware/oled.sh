@@ -3,7 +3,7 @@ I2cAddress="3c"
 Version=`cat ../build_node.sh | grep -Po "(?<=Version=)([0-9]|\.)*(?=\s|$)"`
 
 echo -e "\e[93mOkcash Headless Node Oled-display v$Version :\e[0m"
-echo -e "Author:wareck@gmail.com\n"
+echo -e "Author:wareck@free.fr\n"
 echo -e "This script will install oled-status add-on script and service."
 echo -e "Based on Adafruit ssd1306 script."
 echo -e "Read documentation for installing hardware.\n"

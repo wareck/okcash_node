@@ -1,12 +1,10 @@
 #!/bin/bash
 set -e
-Version=6.6.0
-Release=12/12/2023
-author=wareck@gmail.com
+Version=6.8.0
+Release=04/04/2024
+author=wareck@free.fr
 
 #Okcash headless RPI Working (sync enable, staking enable)
-#Best results found and last version use for this script are :
-#Boost 1.67 / Openssl 1.0.2n / DB 4.8-30 / OkCash git current release (v7.0.0.0)
 
 #download external config:
 source config.txt
@@ -25,7 +23,12 @@ Reboot=${Reboot^^}
 
 if ! [[ $Website_daemon = "APACHE"  || $Website_daemon = "LIGHTTPD" || $Website_daemon = "NGINX" ]];then echo "Error configuration Web_daemon" & exit ;fi
 if ! [[ $Bootstrap = "YES" || $Bootstrap = "NO" ]];then echo "Error configuration Bootstrap" & exit ;fi
+if [ -f /dev/root ]
+then
 SOC=`df | grep /dev/root | awk '{print $4'}`
+else
+SOC=`df / | grep "/" | awk {'print $4'}`
+fi
 if [ -f /boot/dietpi.txt ]
 then
 LSB=$(cat /etc/debian_version)
@@ -42,9 +45,24 @@ exit 0
 ;;
 10)
 img_v="Buster"
+OpenSSL_v="1.0.2u"
+Boost_v="1_67_0"
+DB_v="4.8.30.NC"
+Miniupnpc_v="2.2.3"
 ;;
 11)
 img_v="Bullseye"
+OpenSSL_v="3.0.2"
+Boost_v="1_74_0"
+DB_v="4.8.30.NC"
+Miniupnpc_v="2.2.3"
+;;
+12)
+img_v="Bookworm"
+Boost_v="1_74_0"
+OpenSSL_v="3.0.2"
+DB_v="4.8.30.NC"
+Miniupnpc_v="2.2.3"
 ;;
 *)
 echo -e "\e[38;5;166mUnknown system, please use Raspberry Stretch , Jessie, Buster or Bullseye image...\e[0m"
@@ -56,7 +74,6 @@ F64=$(getconf LONG_BIT)
 if [ $F64 = 64 ]
 then
 F64="YES"
-img_v="Bullseye 64 bits"
 fi
 if [ -f /proc/device-tree/model ]
 then
@@ -98,22 +115,25 @@ then
 wget -q -c https://raw.githubusercontent.com/okcashpro/okcash/master/okcash.pro -O /tmp/okcash.pro
 OKcash_v="`cat /tmp/okcash.pro | grep VERSION | awk '{print$3}' | awk '{print $1}' | grep -v '{'`"
 rm /tmp/okcash.pro
-Comment="(Source from github dev)"
+Comment="(Source from github)"
 else
-OKcash_v=6.9.0.7-aether
+OKcash_v=7.0.0.0-spacemonkey
 Comment="(Release)"
 fi
 echo -e "\n\n\e[97mSoftware Release:\e[0m"
 echo -e "-----------------"
 echo $ident
 echo -e "Raspbian Image            : v$LSB ($img_v)"
+if [ $F64 = "YES" ]
+then
+echo -e "Mode                      : 64 bits"
+fi
 echo -e "Boost                     : $Boost_v"
 echo -e "OpenSSL                   : $OpenSSL_v"
 echo -e "DB Berkeley               : $DB_v"
 echo -e "Miniupnpc                 : $Miniupnpc_v"
 echo -e "Okcash                    : $OKcash_v $Comment"
-
-sleep 2
+sleep 1
 
 if [ $Bootstrap = "YES" ]
 then
@@ -162,6 +182,7 @@ pv_i=""
 gcc_i=""
 xz_i=""
 p7zip_i=""
+zstd_i=""
 pwgen_i=""
 swap_i=""
 xxd=""
@@ -191,17 +212,40 @@ else
 echo -e "[\e[92m YES \e[0m]"
 fi
 
-sleep 1
 if [ $update_me = 1 ]
 then
 echo -e "\n\e[95mRaspberry update:\e[0m"
 sudo apt-get update
 sudo apt-get upgrade -y
 sudo apt-get install aptitude -y
-sudo apt install pv python-dev build-essential $htop_i $ntp_i $pwgen_i $p7zip_i $swap_i $xxd_i -y
+if [ img_v="Bookworm" ]
+then
+python_dev_i="python-dev-is-python3"
+else
+python_dev_i="python-dev"
+fi
+sudo apt install pv git build-essential $python_dev_i $htop_i $ntp_i $pwgen_i $p7zip_i $swap_i $xxd_i $zstd_i -y
 sudo sed -i -e "s/# set const/set const/g" /etc/nanorc
 fi
-sleep 5
+sleep 1
+
+#if [ $img_v = "Bookworm" ] && [ $F64 = "YES" ]
+#then
+#echo -e "\n\e[95mInstall gcc-10.2.0 ToolChain:\e[0m"
+#if [ ! -d gcc-10.2.0 ]
+#then
+#curl http://wareck.free.fr/crypto/okcash/sources/gcc-10.2.0.tar.xz | tar -xJ
+#fi
+#sudo cp -r -v gcc-10.2.0/* /usr/local/
+#sudo update-alternatives --install /usr/bin/gcc gcc /usr/local/bin/aarch64-unknown-linux-gnu-gcc-10.2.0 10 >/dev/null
+#sudo update-alternatives --install /usr/bin/g++ g++ /usr/local/bin/aarch64-unknown-linux-gnu-g++ 10 >/dev/null
+#sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 12 >/dev/null
+#sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 12 >/dev/null
+#sleep 2
+#sudo update-alternatives --set gcc "/usr/local/bin/aarch64-unknown-linux-gnu-gcc-10.2.0" >/dev/null
+#sudo update-alternatives --set g++ "/usr/local/bin/aarch64-unknown-linux-gnu-g++" >/dev/null
+#fi
+
 }
 
 function Download_Extract_ {
@@ -244,13 +288,14 @@ case $Okcash_DEV in
 NO)
 	git clone -n https://github.com/okcashpro/okcash.git
 	cd okcash
-	git reset --hard 06c076698cb8565e624667fede6688fa562b8054
+	git reset --hard f252160e2ed49956d9406585c4ee34e775397ceb #v7
 	cd ..
 	;;
 YES)
 	git clone https://github.com/okcashpro/okcash.git
 	;;
-*)	echo "Error";;
+*)	echo "Error"
+	;;
 esac
 fi
 echo -e "Done."
@@ -264,11 +309,25 @@ arch="linux-aarch64"
 else
 arch="linux-armv4"
 fi
+
 cd openssl-$OpenSSL_v
-./Configure no-zlib no-shared no-dso no-krb5 no-camellia no-capieng no-cast no-dtls1 no-gost no-gmp no-heartbeats no-idea no-jpake \
-no-md2 no-mdc2 no-rc5 no-rdrand no-rfc3779 no-rsax no-sctp no-seed no-sha0 no-static_engine no-whirlpool no-rc2 no-rc4 no-ssl2 no-ssl3 $arch
-make depend
-make -j$(nproc)
+
+case $Okcash_DEV in
+NO)
+	./Configure no-zlib no-shared no-dso no-krb5 no-camellia no-capieng no-cast no-dtls1 no-gost no-gmp no-heartbeats no-idea no-jpake \
+	no-md2 no-mdc2 no-rc5 no-rdrand no-rfc3779 no-rsax no-sctp no-seed no-sha0 no-static_engine no-whirlpool no-rc2 no-rc4 no-ssl2 no-ssl3 $arch
+	make depend
+	make -j$(nproc)
+	;;
+YES)
+	./Configure $arch
+	make depend
+	make -j$(nproc)
+	sudo make install
+	;;
+*)	echo "Error"
+	;;
+esac
 cd ..
 
 echo -e "\n\e[95mBuild DB-$DB_v:\e[0m"
@@ -332,7 +391,7 @@ Flag="--param ggc-min-expand=1 --param ggc-min-heapsize=32768"
 else
 Flag=""
 fi
-if [ $F64 = "YES" ];then a=1;else a="$(nproc)";fi
+if [ $F64 = "YES" ];then a=2;else a="$(nproc)";fi
 make -j$a -w -f makefile.arm CXXFLAGS="$Flag -fcommon -w" \
 OPENSSL_LIB_PATH=$MyDir/openssl-$OpenSSL_v OPENSSL_INCLUDE_PATH=$MyDir/openssl-$OpenSSL_v/include BDB_INCLUDE_PATH=/usr/local/BerkeleyDB.4.8/include/ \
 BDB_LIB_PATH=/usr/local/BerkeleyDB.4.8/lib BOOST_LIB_PATH=/usr/local/lib/ BOOST_INCLUDE_PATH=/usr/local/include/boost/ \
@@ -474,6 +533,7 @@ echo -e "Remove db-4.8.30"
 sudo rm -r -f db-4.8.30 || true
 echo -e "Remove boost_$Boost_v"
 sudo rm -r -f boost_$Boost_v || true
+if [ -d gcc-10.2.0 ];then rm -r gcc-10.2.0 >/dev/null ;fi
 if [ -f .pass ]; then rm .pass >/dev/null ;fi
 echo "Done."
 }
@@ -494,6 +554,15 @@ case $OSV in
 sudo apt-get install php7.3-fpm php7.3-mbstring php7.3-mysql php7.3-gd php7.3-curl php7.3-zip php7.3-xml libapache2-mod-php7.3 -y >/dev/null;;
 11)
 sudo apt-get install php7.4-fpm php7.4-mbstring php7.4-mysql php7.4-gd php7.4-curl php7.4-zip php7.4-xml libapache2-mod-php7.4 -y >/dev/null;;
+12)
+sudo apt install -y apt-transport-https lsb-release ca-certificates wget -y
+sudo wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
+sudo echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/php.list
+sudo apt-get update
+sudo apt-get install php7.4-fpm php7.4-mbstring php7.4-mysql php7.4-gd php7.4-curl php7.4-zip php7.4-xml libapache2-mod-php7.4 -y  >/dev/null
+sudo a2enmod rewrite >/dev/null
+sudo a2enmod php7.4 >/dev/null
+;;
 esac
 fi
 
@@ -505,6 +574,12 @@ case $OSV in
 10)
 sudo apt-get install php7.3-fpm php7.3-curl php7.3-zip php7.3-xml -y >/dev/null;;
 11)
+sudo apt-get install php7.4-fpm php7.4-curl php7.4-zip php7.4-xml -y >/dev/null;;
+12)
+sudo apt install -y apt-transport-https lsb-release ca-certificates wget -y
+sudo wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
+sudo echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/php.list
+sudo apt-get update
 sudo apt-get install php7.4-fpm php7.4-curl php7.4-zip php7.4-xml -y >/dev/null;;
 esac
 fi
@@ -518,10 +593,16 @@ case $OSV in
 sudo apt-get install php7.3-fpm php7.3-curl php7.3-zip -y >/dev/null;;
 11)
 sudo apt-get install php7.4-fpm php7.4-curl php7.4-zip -y >/dev/null;;
+12)
+sudo apt install -y apt-transport-https lsb-release ca-certificates wget -y
+sudo wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
+sudo echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/php.list
+sudo apt-get update
+sudo apt-get install php7.4-fpm php7.4-curl php7.4-zip -y >/dev/null;;
 esac
 fi
-cd /var/www/
 
+cd /var/www/
 if ! [ -f /var/www/node_status/php/config.php ]
 then
         sudo bash -c 'git clone https://github.com/wareck/okcash-node-frontend.git node_status'
@@ -622,12 +703,13 @@ sudo cp /tmp/ng_default /etc/nginx/sites-available/default
 sudo rm /tmp/ng_default
 if [ $OSV = "10" ];then sudo cp /etc/php/7.3/fpm/php.ini . ;fi
 if [ $OSV = "11" ];then sudo cp /etc/php/7.4/fpm/php.ini . ;fi
+if [ $OSV = "12" ];then sudo cp /etc/php/7.4/fpm/php.ini . ;fi
 sudo sed -i -e "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g" php.ini
 if [ $OSV = "10" ];then sudo cp php.ini /etc/php/7.3/fpm/php.ini ;fi
 if [ $OSV = "11" ];then sudo cp php.ini /etc/php/7.4/fpm/php.ini ;fi
+if [ $OSV = "12" ];then sudo cp php.ini /etc/php/7.4/fpm/php.ini ;fi
 sudo rm php.ini
 fi
-
 
 if  ! grep "curl -Ssk http://127.0.0.1/stats.php" /etc/crontab >/dev/null
 then
@@ -759,7 +841,7 @@ fi
 function mkswap {
 if [ $DietPi_ = "NO" ]
 then
-echo -e "\n\e[95mRaspberry optimisation \e[97m Disable Swap:\e[0m"
+echo -e "\n\e[95mRaspberry optimisation\e[97m Disable Swap:\e[0m"
 sudo dphys-swapfile swapoff > /dev/null
 sudo dphys-swapfile uninstall > /dev/null
 sudo systemctl disable dphys-swapfile > /dev/null
@@ -964,6 +1046,7 @@ then
 	sleep 1
 	done
 	echo -e "\n\n"
+
 	sudo reboot
 fi
 else

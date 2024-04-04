@@ -4,7 +4,10 @@ Version=`cat ../build_node.sh | grep -Po "(?<=Version=)([0-9]|\.)*(?=\s|$)"`
 ################
 #Configuration :
 ###############
-Yahboom="NO"  #YES if you use Yahboom RGB/OLED/FAN Hat bought on Amazon
+Hardware="Noctua"
+#DIY for your own FAN build
+#Noctua for 5v 40x40 Noctua fan
+#Yahboom for fan hat Yahboom bought on Amazon
 
 GPIO_PIN=18    #physical GPIO Pin number to turn fan on and off
 Start_TEMP=53 #Start temperature in Celsius
@@ -12,16 +15,19 @@ Gap_TEMP=5    #Wait until the temperature is X degrees under the Max before shut
 PWM=0
 
 echo -e "\n\e[93mOkcash headless Node auto-fan v$Version:\e[0m"
-echo -e "wareck@gmail.com"
+echo -e "wareck@free.fr"
 echo -e ""
 echo -e "This script will install auto-fan control script and service."
 echo -e "Read documentation for installing hardware."
 echo -e "\n\e[97mConfiguration\e[0m"
 echo -e "-------------"
-if [ $Yahboom = "YES" ]
+
+Hardware=${Hardware^^}
+
+
+if [ $Hardware = "YAHBOOM" ]
 then
 echo -e "Yahboom RGB/FAN/oled Hat : Enabled\n"
-else
 echo -e "GPIO Pin    : $GPIO_PIN"
 echo -e "Start Temp  : $Start_TEMP°C"
 echo -e "Gap Temp    : $Gap_TEMP°C"
@@ -34,9 +40,20 @@ fi
 sleep 2
 fi
 
+if [ $Hardware = "NOCTUA" ]
+then
+GPIO_PIN=18
+echo -e "Noctua 5v 40x40 FAN"
+echo -e "GPIO Pin    : $GPIO_PIN"
+echo -e "Start Temp  : $Start_TEMP°C"
+echo -e "Gap Temp    : $Gap_TEMP°C"
+fi
+
+
+
 if ! [ -x /opt/vc/bin/vcgencmd ]
 then
-echo -e "\n\e[95mBuild userland pack (missing in Raspbian Bullseye):\e[0m"
+echo -e "\n\e[95mBuild Userland Pack :\e[0m"
 #build from source:
 #sudo apt-get install cmake git -y
 #echo -e ""
@@ -51,6 +68,118 @@ rm -r -f userland
 sudo rm /opt/vc/bin/vcgencmd
 sudo cp /usr/bin/vcgencmd /opt/vc/bin/vcgencmd
 fi
+
+function Noctua_fan (){
+echo -e "\n\e[95mBuild run-fan.py script :\e[0m"
+MyUser=$USER
+if [ -f /boot/dietpi.txt ];then sudo apt-get install python rpi.gpio -y && DietPi_="YES";else DietPi_="NO";fi
+if [ ! -d /home/$USER/scripts ];then mkdir /home/$USER/scripts ; fi
+if [ -f /home/$USER/scripts/run-fan.py ];then rm /home/$USER/scripts/run-fan.py ; fi
+cat <<'EOF'>> /home/$USER/scripts/run-fan.py
+#!/usr/bin/env python3
+import RPi.GPIO as GPIO
+import time
+import signal
+import sys
+import os
+
+# Configuration
+GPIO_PIN = XXXXX        # BCM pin used to drive PWM fan
+WAIT_TIME = 1           # [s] Time to wait between each refresh
+PWM_FREQ = 25           # [kHz] 25kHz for Noctua PWM control
+
+# Configurable temperature and fan speed
+MIN_TEMP = YYYYY
+MAX_TEMP = 70
+FAN_LOW = 40
+FAN_HIGH = 100
+FAN_OFF = 0
+FAN_MAX = 100
+
+# Get CPU's temperature
+def getCpuTemperature():
+    res = os.popen('vcgencmd measure_temp').readline()
+    temp =(res.replace("temp=","").replace("'C\n",""))
+    #print("temp is {0}".format(temp)) # Uncomment for testing
+    return temp
+
+# Set fan speed
+def setFanSpeed(speed):
+    fan.start(speed)
+    return()
+
+# Handle fan speed
+def handleFanSpeed():
+    temp = float(getCpuTemperature())
+    # Turn off the fan if temperature is below MIN_TEMP
+    if temp < MIN_TEMP:
+        setFanSpeed(FAN_OFF)
+        #print("Fan OFF") # Uncomment for testing
+    # Set fan speed to MAXIMUM if the temperature is above MAX_TEMP
+    elif temp > MAX_TEMP:
+        setFanSpeed(FAN_MAX)
+        #print("Fan MAX") # Uncomment for testing
+    # Caculate dynamic fan speed
+    else:
+        step = (FAN_HIGH - FAN_LOW)/(MAX_TEMP - MIN_TEMP)
+        temp -= MIN_TEMP
+        setFanSpeed(FAN_LOW + ( round(temp) * step ))
+        #print(FAN_LOW + ( round(temp) * step )) # Uncomment for testing
+    return ()
+
+try:
+    # Setup GPIO pin
+    GPIO.setwarnings(False)
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(GPIO_PIN, GPIO.OUT, initial=GPIO.LOW)
+    fan = GPIO.PWM(GPIO_PIN,PWM_FREQ)
+    setFanSpeed(FAN_OFF)
+    # Handle fan speed every WAIT_TIME sec
+    while True:
+        handleFanSpeed()
+        time.sleep(WAIT_TIME)
+
+except KeyboardInterrupt: # trap a CTRL+C keyboard interrupt
+    setFanSpeed(FAN_HIGH)
+    #GPIO.cleanup() # resets all GPIO ports used by this function
+EOF
+
+echo -e "\n\e[95mApply Configuration :\e[0m"
+sed -i -e "s/XXXXX/$GPIO_PIN/g" /home/$USER/scripts/run-fan.py
+sed -i -e "s/YYYYY/$Start_TEMP/g" /home/$USER/scripts/run-fan.py
+echo -e "Done."
+
+echo -e "\n\e[95mBuild run-fan.service script :\e[0m"
+if [ -f /tmp/run-fan.service ]; then rm /tmp/run-fan.service;fi
+sudo cat <<'EOF'>> /tmp/run-fan.service
+[Unit]
+Description=autofan control
+After=meadiacenter.service
+[Service]
+   User=root
+   Group=root
+   Type=simple
+   ExecStart=/usr/bin/python /home/XXX/scripts/run-fan.py
+   Restart=always
+
+  [Install]
+   WantedBy=multi-user.target
+EOF
+sed -i -e "s/XXX/$MyUser/g" /tmp/run-fan.service
+if [ $DietPi_ = "NO" ]
+then
+OSV=$(sed 's/\..*//' /etc/debian_version)
+if [ $OSV = 11 ]
+then sed -i -e "s/python/python3/g" /tmp/run-fan.service
+fi
+fi
+sudo bash -c 'cp /tmp/run-fan.service /lib/systemd/system/ | sudo -s'
+echo -e "Done"
+sleep 1
+
+sudo systemctl daemon-reload
+sudo systemctl enable run-fan.service
+}
 
 function hardware_diy(){
 echo -e "\n\e[95mBuild run-fan.py script :\e[0m"
@@ -320,12 +449,20 @@ sleep 1
 echo -e "Done"
 }
 
-if [ $Yahboom = "YES" ]
-then
-Yahboom_hat
-else
-hardware_diy
-fi
-
+case $Hardware in
+YAHBOOM)
+	Yahboom_hat
+	;;
+NOCTUA)
+	Noctua_fan
+	;;
+DIY)
+	hardware_diy
+	;;
+*)
+	echo "config error"
+	exit
+	;;
+esac
 echo -e "\n\e[97mInstall is finished !!!\e[0m"
 echo ""

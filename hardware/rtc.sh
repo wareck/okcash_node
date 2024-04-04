@@ -3,7 +3,7 @@ set -e
 Version=1.1
 
 echo -e "\e[93mRTC hardware addon v$Version :\e[0m"
-echo -e "wareck@gmail.com"
+echo -e "wareck@free.fr"
 echo -e ""
 
 if [ -f /boot/dietpi.txt ];then DietPi_="YES";else DietPi_="NO";fi

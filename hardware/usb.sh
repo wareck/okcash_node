@@ -2,7 +2,7 @@
 set -e
 Version=`cat ../build_node.sh | grep -Po "(?<=Version=)([0-9]|\.)*(?=\s|$)"`
 echo -e "\e[93mOkcash Headless Node builder $Version USB Tool\e[0m"
-echo -e "Author : wareck@gmail.com"
+echo -e "Author : wareck@free.fr"
 
 function update_ {
 if ! [ -x "$(command -v mkfs.f2fs)" ];then a="f2fs-tools";fi
